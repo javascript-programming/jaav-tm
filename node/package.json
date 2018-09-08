@@ -1,0 +1,7 @@
+{
+  "name": "tendermint",
+  "version": "0.0.1",
+  "dependencies": {
+    "tendermint-node": "^3.2.0"
+  }
+}
