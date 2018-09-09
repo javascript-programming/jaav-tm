@@ -2,6 +2,9 @@
   "name": "tendermint",
   "version": "0.0.1",
   "dependencies": {
+    "abci": "^4.0.0",
+    "fs-extra": "^7.0.0",
+    "path": "^0.12.7",
     "tendermint-node": "^3.2.0"
   }
 }

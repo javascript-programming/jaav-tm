@@ -1,0 +1,23 @@
+{
+  "genesis_time": "2018-09-09T12:30:12.328331783Z",
+  "chain_id": "chain-no2Hxk",
+  "validators": [
+    {
+      "pub_key": {
+        "type": "tendermint/PubKeyEd25519",
+        "value": "JH9umot+RbuSFH/XnUOlnOi4ovLfjADTtyloAT9mPp8="
+      },
+      "power": "1",
+      "name": "node0"
+    },
+    {
+      "pub_key": {
+        "type": "tendermint/PubKeyEd25519",
+        "value": "+VQ0X+9Ac47rpxVasaivu36UBXQ4s+wetUaykM+81gc="
+      },
+      "power": "1",
+      "name": "node1"
+    }
+  ],
+  "app_hash": ""
+}
