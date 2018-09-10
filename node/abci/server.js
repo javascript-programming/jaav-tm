@@ -1,22 +1,26 @@
 const server = require('abci');
+const TU = require('../common/transactionutils');
 
 class ABCIServer {
 
     constructor () {
 
-        const me = this;
-
         this.state = {
-            count : 0
+            accounts : {}
         };
 
-        let handlers = Object.assign.call({},
+        this.handlers = {};
+
+        let coreHandlers = Object.assign.call({},
             this.getBlockHandlers(),
             this.getCheckTxHandler(),
-            this.getDeliveryTxHandler(),
-            this.getCommitHandler());
+            this.getDeliveryTxHandler());
 
-        this.server = server(handlers);
+        this.server = server(coreHandlers);
+    }
+
+    use (handler) {
+        this.handlers[handler.getNameSpace()] = handler;
     }
 
     getTransaction (request) {
@@ -31,41 +35,39 @@ class ABCIServer {
     }
 
     getBlockHandlers () {
-        return {
-            info (request) {
-                return {
-                    data: 'Node.js counter app',
-                    version: '0.0.0',
-                    lastBlockHeight: 0,
-                    lastBlockAppHash: Buffer.alloc(0)
-                }
-            },
 
-            // beginBlock (request) {
-            //     //store block height and hash to return in info
-            //     debugger
-            // },
-            //
-            // endBlock (request) {
-            //     debugger
-            // }
+        const fn = (request) => {
+            return {
+                data: 'Node.js counter app',
+                version: '0.0.0',
+                lastBlockHeight: 0,
+                lastBlockAppHash: Buffer.alloc(0)
+            }
+        };
+
+        return {
+            info : fn.bind(this)
         }
     }
-
 
 
     getCheckTxHandler () {
 
         const fn = (request) => {
 
-            let transaction = this.getTransaction(request);
+            try {
 
-            if (false) {
-                return {code: 1, log: 'tx does not match count'}
+                let transaction = this.getTransaction(request);
+
+                if (!TU.verifyTx(transaction))
+                    throw new Error('Signature not valid');
+
+                return { code: 0, log: 'tx succeeded'}
+
+            } catch (err) {
+                return { code: 1, log: err.message }
             }
 
-
-            return { code: 0, log: 'tx succeeded'}
         };
 
         return {
@@ -77,16 +79,18 @@ class ABCIServer {
 
         const fn = (request) => {
 
-            let transaction = this.getTransaction(request);
+            try {
+                let transaction = this.getTransaction(request);
 
-            if (false) {
-                return {code: 1, log: 'tx does not match count'}
+                if (!TU.verifyTx(transaction))
+                    throw new Error('Signature not valid');
+
+                const handler = this.getHandler(tx);
+                return { code: 0, log: handler(this.state, transaction) || 'tx succeeded'}
+
+            } catch (err) {
+                return { code: 1, log: err.message }
             }
-
-            // update state
-            this.state.count += 1;
-
-            return { code: 0, log: 'tx succeeded'}
         };
 
         return {
@@ -94,13 +98,14 @@ class ABCIServer {
         }
     }
 
-    getCommitHandler () {
-        return {
-            // commit (request) {
-            //     debugger
-            //     //return root merkle hash
-            // }
-        }
+    getHandler(tx) {
+       try {
+            const target = tx.cmd.split('.');
+            const handler = this.handlers[target[0]];
+            return [target[1]].bind(handler);
+       } catch (err) {
+           throw new Error('Handler not found');
+       }
     }
 
     start (port = 46658) {

@@ -1,7 +1,7 @@
 const fse = require('fs-extra');
 const fs = require('fs');
 
-class Utils {
+class Fileutils {
 
     static async removePath (path) {
         try {
@@ -15,7 +15,7 @@ class Utils {
     static async makeDirWhenNotExists (path) {
 
         if (!fs.existsSync(path)) {
-            await Utils.makeDir(path);
+            await Fileutils.makeDir(path);
         }
     }
 
@@ -47,4 +47,4 @@ class Utils {
 
 }
 
-module.exports = Utils;
+module.exports = Fileutils;

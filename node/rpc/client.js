@@ -1,5 +1,7 @@
 const WebSocket = require('ws');
-let stringify = require('json-stable-stringify');
+const stringify = require('json-stable-stringify');
+const uuidv1 = require('uuid/v1');
+const TU = require('../common/transactionutils');
 
 class RPCClient {
 
@@ -15,52 +17,37 @@ class RPCClient {
         this.transactions = {};
     }
 
-    set console (console) {
+    send (tx) {
 
-        const me = this;
+        return new Promise((resolve, reject) => {
 
-        console.setFunction('send', {
-            params : ['value'],
-            handler : (value) => {
-                me.sendTx(value);
-            }
+            if (!TU.verifyTx(tx))
+               reject('Transaction not signed properly');
+
+            const id = uuidv1();
+
+            let call = {
+                "method"    : "broadcast_tx_sync",
+                "jsonrpc"   : "2.0",
+                "params"    : [ Buffer.from(tx).toString('base64')],
+                "id"        : id
+            };
+
+            this.transactions[id] = tx;
+            this.ws.send(stringify(call));
+            resolve();
         });
-    }
-
-    sendTx (value) {
-
-        if (!value)
-            return;
-
-        let tx = stringify({
-            account : 'terence',
-            to : 'balabla',
-            value : value,
-            arr : [1, 2, 3, 'a'],
-            bool : true
-        });
-
-
-        let call = {
-            "method"    : "broadcast_tx_sync",
-            "jsonrpc"   : "2.0",
-            "params"    : [ Buffer.from(tx).toString('base64')],
-            "id"        : "test"
-        };
-
-        this.transactions[call.id] = tx;
-        this.ws.send(stringify(call));
     }
 
     onMessage (data) {
         console.log(data);
+        debugger
     }
 
     setReady () {
         console.log('Websocket connection to tendermint rpc established');
         this.ready = true;
     }
-
 }
 
 module.exports = RPCClient;

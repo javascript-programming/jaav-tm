@@ -6,11 +6,9 @@ class RPCServer {
         this.client = new Client(tendermintPort);
     }
 
-    set console (console) {
-        this.client.console = console;
+    getClient () {
+        return this.client;
     }
-
-
 }
 
 module.exports = RPCServer;

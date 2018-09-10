@@ -1,6 +1,6 @@
 const tendermint = require('tendermint-node');
 const path = require('path');
-const Utils = require('../common/utils');
+const Utils = require('../common/fileutils');
 
 class TendermintNode {
 
