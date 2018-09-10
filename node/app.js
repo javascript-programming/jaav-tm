@@ -1,5 +1,5 @@
 const Commands = require('./commands');
-const Console = require('console');
+const Console = require('./console');
 const Wallet = require('./wallet/wallet');
 
 const commands = new Commands();
@@ -11,10 +11,12 @@ if (options.rpc) {
     const rpcServer = new RPCServer(options.rpc);
 
     const client = rpcServer.getClient();
-    const wallet = new Wallet(client, options.home);
-    const console = new Console();
-    wallet.console = console;
 
+    client.connect().then(() => {
+        const wallet = new Wallet(client, options.home);
+        const console = new Console();
+        wallet.console = console;
+    });
 
 } else {
 

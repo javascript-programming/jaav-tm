@@ -9,44 +9,73 @@ class RPCClient {
 
         this.wsRpcUrl = 'ws://localhost:' + rpcPort + '/websocket';
 
-        this.ws = new WebSocket(this.wsRpcUrl);
-
-        this.ws.on('open', this.setReady.bind(this));
-        this.ws.on('message',this.onMessage.bind(this));
-
         this.transactions = {};
+    }
+
+    connect () {
+
+        return new Promise( (resolve, reject) => {
+
+            try {
+                this.ws = new WebSocket(this.wsRpcUrl);
+
+                this.ws.on('open', () => {
+                    this.setReady.bind(this)(resolve);
+                });
+            } catch (err) {
+                reject(err.message);
+            }
+        });
+
     }
 
     send (tx) {
 
         return new Promise((resolve, reject) => {
 
-            if (!TU.verifyTx(tx))
-               reject('Transaction not signed properly');
-
             const id = uuidv1();
 
             let call = {
-                "method"    : "broadcast_tx_sync",
-                "jsonrpc"   : "2.0",
-                "params"    : [ Buffer.from(tx).toString('base64')],
-                "id"        : id
+                "method" : "broadcast_tx_sync",
+                "jsonrpc": "2.0",
+                "params" : [Buffer.from(stringify(tx)).toString('base64')],
+                "id"     : id
             };
 
-            this.transactions[id] = tx;
+            this.transactions[id] = { resolve, reject };
             this.ws.send(stringify(call));
-            resolve();
         });
     }
 
     onMessage (data) {
-        console.log(data);
-        debugger
+        data = JSON.parse(data);
+
+        let transaction = this.transactions[data.id];
+
+        if (transaction) {
+
+            if (data.result.code === 0) {
+                transaction.resolve(data);
+            } else {
+                transaction.reject(data);
+            }
+
+           delete this.transactions[data.id];
+        }
     }
 
-    setReady () {
+    onClose () {
+        this.ready = false;
+        console.log('Websocket connection to tendermint rpc closed');
+        this.connect();
+    }
+
+    setReady (cb) {
         console.log('Websocket connection to tendermint rpc established');
         this.ready = true;
+        this.ws.on('message', this.onMessage.bind(this));
+        this.ws.on('close', this.onClose.bind(this));
+        cb();
     }
 }
 

@@ -47,7 +47,7 @@ class TransActionUtils {
 
     static verifyByAccount (message, signature, account, pubKey) {
         const mess = Buffer.from(this.sha256(message), 'utf-8');
-        return secp.verify(mess, signature, new Buffer(pubKey, 'hex')) && account === this.addressHash(pubkey);
+        return secp.verify(mess, signature, new Buffer(pubKey, 'hex')) && account === this.addressHash(pubKey);
     }
 
     static clone (obj) {
@@ -76,6 +76,7 @@ class TransActionUtils {
 
         return this.signTx({
             cmd     : cmd,
+            account : account,
             pubkey  : pubKey,
             params  : params || {},
             to      : to,
@@ -89,6 +90,11 @@ class TransActionUtils {
 
         if (signature) {
             delete tx.signature;
+
+            if (signature.type) {
+                signature = Buffer.from(signature.data);
+            }
+
             let stx = this.getSigMsg(tx);
             return this.verifyByAccount(stx, signature, tx.account, tx.pubkey);
 

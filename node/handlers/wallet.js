@@ -1,5 +1,3 @@
-const common = require('./common');
-
 class TransActionHandler {
 
     static getNameSpace () {
