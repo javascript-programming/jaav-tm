@@ -10,8 +10,24 @@ class ABCIServer {
             count : 0
         };
 
-        let handlers = Object.assign.call({}, this.getBlockHandlers(), this.getCheckTxHandler(), this.getCommitHandler());
+        let handlers = Object.assign.call({},
+            this.getBlockHandlers(),
+            this.getCheckTxHandler(),
+            this.getDeliveryTxHandler(),
+            this.getCommitHandler());
+
         this.server = server(handlers);
+    }
+
+    getTransaction (request) {
+
+        let message = Buffer.from(request.tx, 'base64').toString();
+
+        try {
+            return JSON.parse(message);
+        } catch (err) {
+            return message;
+        }
     }
 
     getBlockHandlers () {
@@ -23,46 +39,58 @@ class ABCIServer {
                     lastBlockHeight: 0,
                     lastBlockAppHash: Buffer.alloc(0)
                 }
-            }
+            },
 
             // beginBlock (request) {
             //     //store block height and hash to return in info
+            //     debugger
             // },
             //
             // endBlock (request) {
-            //
+            //     debugger
             // }
         }
     }
 
-    getCheckTxHandler () {
-        return {
-            checkTx (request) {
 
-                // do basic validations on the request, do not modify state
-                if (false) {
-                    return { code: 1, log: 'tx does not match count' }
-                }
-                return { code: 0, log: 'tx succeeded' }
+
+    getCheckTxHandler () {
+
+        const fn = (request) => {
+
+            let transaction = this.getTransaction(request);
+
+            if (false) {
+                return {code: 1, log: 'tx does not match count'}
             }
+
+
+            return { code: 0, log: 'tx succeeded'}
+        };
+
+        return {
+            checkTx : fn.bind(this)
         }
     }
 
     getDeliveryTxHandler () {
 
-        let me = this;
+        const fn = (request) => {
+
+            let transaction = this.getTransaction(request);
+
+            if (false) {
+                return {code: 1, log: 'tx does not match count'}
+            }
+
+            // update state
+            this.state.count += 1;
+
+            return { code: 0, log: 'tx succeeded'}
+        };
 
         return {
-            deliverTx(request) {
-                if (false) {
-                    return {code: 1, log: 'tx does not match count'}
-                }
-
-                // update state
-                me.state.count += 1;
-
-                return { code: 0, log: 'tx succeeded'}
-            }
+            deliverTx: fn.bind(this)
         }
     }
 
