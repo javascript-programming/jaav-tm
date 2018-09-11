@@ -3,8 +3,7 @@
   "chain_id": "test-chain-c8XNNu",
   "consensus_params": {
     "block_size_params": {
-      "max_bytes": "22020096",
-      "max_txs": "10000",
+      "max_txs_bytes": "22020096",
       "max_gas": "-1"
     },
     "tx_size_params": {

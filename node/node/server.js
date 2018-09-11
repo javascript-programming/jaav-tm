@@ -7,13 +7,13 @@ class TendermintNode {
     constructor (home, config, rpcPort = 46657, abciPort = 46658) {
 
         this.home       = home || path.join(__dirname, '../../network');
-        this.rpcUrl     = 'tcp://0.0.0.0:'      + rpcPort;
+        this.rpcUrl     = 'tcp://0.0.0.0:'    + rpcPort;
         this.abciUrl    = 'tcp://0.0.0.0:'    + abciPort;
 
         if (config) {
             config = path.join(__dirname, '../../configurations', path.join(config, 'config'));
             Utils.removePath(this.home);
-            Utils.copyDir(config, this.home);
+            Utils.copyDir(config, path.join(this.home, 'config'));
 
         } else {
             Utils.makeDirWhenNotExists(this.home);

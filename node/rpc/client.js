@@ -53,12 +53,6 @@ class RPCClient {
 
             const id = uuidv1();
 
-            const params = {
-                trusted : false,
-                path : path,
-                data : data
-            };
-
             let call = {
                 "method"    : "abci_query",
                 "jsonrpc"   : "2.0",

@@ -3,35 +3,35 @@ const fs = require('fs');
 
 class Fileutils {
 
-    static async removePath (path) {
+    static removePath (path) {
         try {
-            await fse.remove(path);
+            fse.removeSync(path);
             console.log(path + ' removed');
         } catch (err) {
             console.log(err.message);
         }
     }
 
-    static async makeDirWhenNotExists (path) {
+    static makeDirWhenNotExists (path) {
 
         if (!fs.existsSync(path)) {
-            await Fileutils.makeDir(path);
+            Fileutils.makeDir(path);
         }
     }
 
-    static async makeDir (path) {
+    static makeDir (path) {
         try {
-            await fse.ensureDir(path);
+            fse.ensureDirSync(path);
             console.log(path + ' created')
         } catch (err) {
             console.error(err.message)
         }
     }
 
-    static async copyDir (path, target) {
+    static copyDir (path, target) {
         try {
             this.makeDir(target);
-            await fse.copy(path, target);
+            fse.copySync(path, target);
         } catch (err) {
             console.log(err.message);
         }
@@ -39,7 +39,7 @@ class Fileutils {
 
     static async copyFile (path, target) {
         try {
-            await fse.copy(path, target);
+            fse.copySync(path, target);
         } catch (err) {
             console.log(err.message);
         }
