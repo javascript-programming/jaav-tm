@@ -13,7 +13,8 @@ class TransActionHandler {
             throw new Error('Account already exists');
 
         state.accounts[tx.params.account] = {
-            balance: 1000
+            balance: 1000,
+            cashbook: []
         };
 
         return 'Account created';
@@ -30,6 +31,14 @@ class TransActionHandler {
             if (state.accounts[tx.account].balance >= tx.value) {
                 state.accounts[tx.to].balance += tx.value;
                 state.accounts[tx.account].balance -= tx.value;
+
+                let message = tx.params.message;
+                let cashRecord = { from: tx.account, amount: tx.value, message };
+                state.accounts[tx.to].cashbook.push(cashRecord);
+
+                cashRecord = { to: tx.to, amount: tx.value, message };
+                state.accounts[tx.account].cashbook.push(cashRecord);
+
             } else {
                 throw new Error('Insufficient funds you have!');
             }

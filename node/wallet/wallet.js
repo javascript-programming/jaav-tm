@@ -80,7 +80,7 @@ class Wallet {
         });
 
         console.setFunction('transfer', {
-            params : ['account', 'to', 'amount', 'password'],
+            params : ['account', 'to', 'amount', 'message', 'password'],
             handler : (...params) => { return me.transfer.apply(me, params); },
             async   : true
         });
