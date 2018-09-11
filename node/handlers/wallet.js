@@ -10,7 +10,7 @@ class TransActionHandler {
             throw new Error('Account origin should be sender');
 
         if (state.accounts[tx.params.account])
-            throw new Error('Accounts already exists');
+            throw new Error('Account already exists');
 
         state.accounts[tx.params.account] = {
             balance: 1000
