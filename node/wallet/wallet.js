@@ -227,7 +227,7 @@ class Wallet {
     async getBalance(account) {
         account = account || this.wallet.account;
 
-        let record = await this.client.query('account', { account : account} ).catch((err) => {
+        let record = await this.client.query(`accounts/${account}`, {} ).catch((err) => {
             console.log(err);
         });
 

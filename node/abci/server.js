@@ -56,7 +56,7 @@ class ABCIServer {
             return {
                 data: 'Jaav contract platform',
                 version: '1.0.0',
-                lastBlockHeight:  this.stateManager.chainInfo.height//,
+                lastBlockHeight:  height,
                 //lastBlockAppHash: height === 0 ? Buffer.alloc(0): this.stateManager.hash
             }
         };

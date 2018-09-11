@@ -23,42 +23,40 @@ class StateManager {
         return this._state;
     }
 
+    getPathData (path) {
+
+        let result = this.state;
+
+        for (let i = 0; i < path.length; i++) {
+            result = result[path[i]];
+            if (!result) {
+                throw new Error(`Data path ${path.join('/')} not found`);
+            }
+        }
+
+        return result;
+    }
+
     query (request) {
 
-        const path = request.path || '';
-        const prove = request.prove;
-        const params = TU.parsePayload(request.data);
+        const path = (request.path || '').split('/');
 
         let result = {
             height : this.chainInfo.height - 1,
-            proof : '',
-            key   : '',
+            key   : path.join('/'),
             index : 0,
-            code  : 1,
-            log   : 'Query failed'
+            code  : 1
         };
 
-        switch (path) {
-            case 'account':
-
-                const account = this.state.accounts[params.account];
-
-                if (account) {
-                    result.value = Buffer.from(stringify(account));
-                    result.code = 0;
-                } else {
-                    result.log = 'Account not found';
-                }
-
-                break;
-
-            case 'state':
-                result.value = Buffer.from(stringify(this.state));
-                result.code = 0;
-                break;
+        try {
+            const data = this.getPathData(path);
+            result.value = Buffer.from(stringify(data));
+            result.proof = TU.sha256(result.value);
+            result.code = 0;
+        } catch (err) {
+            result.log = err.message;
         }
 
-        result.code === 0 && (result.log = '');
         return result;
     }
 

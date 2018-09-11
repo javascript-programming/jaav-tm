@@ -36,7 +36,6 @@ class Console {
         }
     }
 
-
     askParam (param) {
         return new Promise((resolve, reject) => {
             this.rl.question(`Param value for ${param} : `, (answer) => {

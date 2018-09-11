@@ -38,7 +38,7 @@ class RPCClient {
             let call = {
                 "method" : "broadcast_tx_sync",
                 "jsonrpc": "2.0",
-                "params" : [Buffer.from(stringify(tx)).toString('base64')],
+                "params" : [TU.convertObjectToBase64(tx)],
                 "id"     : id
             };
 
@@ -56,7 +56,7 @@ class RPCClient {
             let call = {
                 "method"    : "abci_query",
                 "jsonrpc"   : "2.0",
-                "params"    : [path, Buffer.from(stringify(data)).toString('hex'), "1", false ],
+                "params"    : [path, TU.convertObjectToHex(data), "1", false ],
                 "id"        : id
             };
 

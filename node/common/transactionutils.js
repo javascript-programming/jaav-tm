@@ -115,6 +115,14 @@ class TransActionUtils {
         }
     }
 
+    static convertObjectToBase64 (obj) {
+        return Buffer.from(stringify(obj)).toString('base64');
+    }
+
+    static convertObjectToHex (obj) {
+        return Buffer.from(stringify(obj)).toString('hex');
+    }
+
     static signTx (tx, privKey) {
         let stx = this.getSigMsg(tx);
         tx.signature = this.signByAccount(stx, privKey);
