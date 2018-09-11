@@ -104,6 +104,17 @@ class TransActionUtils {
         }
     }
 
+    static parsePayload (payload) {
+
+        let message = Buffer.from(payload, 'base64').toString();
+
+        try {
+            return JSON.parse(message);
+        } catch (err) {
+            return message;
+        }
+    }
+
     static signTx (tx, privKey) {
         let stx = this.getSigMsg(tx);
         tx.signature = this.signByAccount(stx, privKey);

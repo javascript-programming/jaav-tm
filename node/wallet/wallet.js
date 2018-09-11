@@ -227,13 +227,14 @@ class Wallet {
     async getBalance(account) {
         account = account || this.wallet.account;
 
-        let accounts = await this.client.state.accounts;
+        let record = await this.client.query('account', { account : account} ).catch((err) => {
+            console.log(err);
+        });
 
-        let ca = await accounts[account];
-        if (ca == null) {
+        if (record == null) {
             return 0
         }
-        return ca.balance
+        return record.balance;
     }
 }
 

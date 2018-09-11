@@ -47,6 +47,38 @@ class RPCClient {
         });
     }
 
+    query (path, data) {
+
+        return new Promise((resolve, reject) => {
+
+            const id = uuidv1();
+
+            const params = {
+                trusted : false,
+                path : path,
+                data : data
+            };
+
+            let call = {
+                "method"    : "abci_query",
+                "jsonrpc"   : "2.0",
+                "params"    : [path, Buffer.from(stringify(data)).toString('hex'), "1", false ],
+                "id"        : id
+            };
+
+            this.transactions[id] = {
+                resolve : (data) => {
+                    const result = TU.parsePayload(data.result.response.value);
+                    resolve(result);
+                },
+                reject : (data) => {
+                    reject(data.result.response.log);
+                }
+            };
+            this.ws.send(stringify(call));
+        });
+    }
+
     onMessage (data) {
         data = JSON.parse(data);
 
@@ -54,7 +86,7 @@ class RPCClient {
 
         if (transaction) {
 
-            if (data.result.code === 0) {
+            if (data.result.code === 0 || (data.result.response && !data.result.response.code)) {
                 transaction.resolve(data);
             } else {
                 transaction.reject(data);

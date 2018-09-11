@@ -1,21 +1,26 @@
 const server = require('abci');
 const TU = require('../common/transactionutils');
 const stringify = require('json-stable-stringify');
+const StateManager = require('./statemanager');
 
 class ABCIServer {
 
     constructor () {
 
-        this.state = {
+        this.stateManager = new StateManager({
             accounts : {}
-        };
+        });
 
-        this.chainInfo = {};
+
+        this.stateManager.chainInfo = {
+            height : 0
+        };
 
         this.handlers = {};
 
         let coreHandlers = Object.assign.call({},
             this.getInitChainHandler(),
+            this.getQueryHander(),
             this.getInfoHandler(),
             this.getBeginBlockHandler(),
             this.getEndBlockHandler(),
@@ -31,72 +36,68 @@ class ABCIServer {
     }
 
     getTransaction (request) {
+        return TU.parsePayload(request.tx);
+    }
 
-        let message = Buffer.from(request.tx, 'base64').toString();
+    getQueryHander () {
+        const query = (request) => {
+            return this.stateManager.query(request);
+        };
 
-        try {
-            return JSON.parse(message);
-        } catch (err) {
-            return message;
-        }
+        return { query }
     }
 
     getInfoHandler () {
 
-        const fn = (request) => {
+        const info = (request) => {
+
+            const height = this.stateManager.chainInfo.height;
+
             return {
                 data: 'Jaav contract platform',
                 version: '1.0.0',
-                lastBlockHeight: 0,
-                lastBlockAppHash: TU.sha256(stringify(this.state))
+                lastBlockHeight:  this.stateManager.chainInfo.height//,
+                //lastBlockAppHash: height === 0 ? Buffer.alloc(0): this.stateManager.hash
             }
         };
 
-        return {
-            info : fn.bind(this)
-        }
+        return { info }
     }
 
     getBeginBlockHandler () {
-        const fn = (request) => {
+        const beginBlock = (request) => {
             return {
                 tags : []
             }
         };
 
-        return {
-            beginBlock : fn.bind(this)
-        }
+        return { beginBlock }
     }
 
     getEndBlockHandler () {
-        const fn = (request) => {
-            this.chainInfo.height = request.height.toNumber();
+        const endBlock = (request) => {
+            this.stateManager.chainInfo.height = request.height.toNumber();
             return {
                 tags : []
             }
         };
 
-        return {
-            endBlock : fn.bind(this)
-        }
+        return { endBlock }
     }
 
     getInitChainHandler () {
-        const fn = ({ validators }) => {
-            this.chainInfo.validators = validators;
+        const initChain = ({ validators }) => {
+            this.stateManager.chainInfo.validators = validators;
             return {};
         };
 
-        return {
-            initChain : fn.bind(this)
-        }
+        return { initChain }
     }
 
 
     getCheckTxHandler () {
 
-        const fn = (request) => {
+        const checkTx = (request) => {
 
             try {
 
@@ -113,14 +114,12 @@ class ABCIServer {
 
         };
 
-        return {
-            checkTx : fn.bind(this)
-        }
+        return { checkTx }
     }
 
     getDeliveryTxHandler () {
 
-        const fn = (request) => {
+        const deliverTx = (request) => {
 
             try {
                 let transaction = this.getTransaction(request);
@@ -129,28 +128,24 @@ class ABCIServer {
                     throw new Error('Signature not valid');
 
                 const handler = this.getHandler(transaction);
-                return { code: 0, log: handler(this.state, transaction, this.chainInfo) || 'tx succeeded'}
+                return { code: 0, log: handler(this.stateManager.state, transaction, this.stateManager.chainInfo) || 'tx succeeded'}
 
             } catch (err) {
                 return { code: 1, log: err.message }
             }
         };
 
-        return {
-            deliverTx: fn.bind(this)
-        }
+        return { deliverTx }
     }
 
     getCommitHandler () {
-        const fn = (request) => {
+        const commit = (request) => {
             return {
-                data : TU.sha256(stringify(this.state))
+                data : this.stateManager.hash
             }
         };
 
-        return {
-            commit : fn.bind(this)
-        }
+        return { commit }
     }
 
     getHandler(tx) {
