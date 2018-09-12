@@ -1,5 +1,3 @@
-
-
 class MyChat {
 
     constructor (initialState) {
@@ -47,5 +45,4 @@ class MyChat {
             throw new Error('You need to be the sender');
         }
     }
-
 }

@@ -8,7 +8,8 @@ class ABCIServer {
     constructor () {
 
         this.stateManager = new StateManager({
-            accounts : {}
+            accounts    : {},
+            contracts   : {}
         });
 
 
