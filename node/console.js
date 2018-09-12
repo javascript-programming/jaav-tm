@@ -27,10 +27,12 @@ class Console {
 
             fn.handler = (...params) => {
 
-                var result = rawFn.apply(fn.scope || this, params);
-
                 return new Promise((resolve, reject) => {
-                    resolve(result);
+                    try {
+                        resolve(rawFn.apply(fn.scope || this, params));
+                    } catch (err) {
+                        reject(err.message);
+                    }
                 });
             }
         }

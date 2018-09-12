@@ -7,9 +7,9 @@ const Compiler = require('./compiler/contractcompiler');
 
 class Contracts {
 
-    constructor (client, home) {
-        this.client = client;
-        this.home = home || path.join(__dirname, '../../network');
+    constructor (wallet) {
+        this.client = wallet.client;
+        this.home = wallet.home;
 
         this.contractWalletPath = path.join(this.home, 'contracts.json');
         this.contractSourceFolder = path.join(__dirname, '../../contracts');
@@ -86,8 +86,36 @@ class Contracts {
         return result.join(',');
     }
 
-    deploy (code) {
+    deploy (account, password, contract) {
 
+        const me = this;
+
+        return new Promise( (resolve, reject) => {
+
+            const entry = me.contracts[contract];
+
+            if (entry) {
+
+                if (!entry.code)
+                    me.compile();
+
+                entry.keys = TU.createNewKeyAndAddress();
+
+                const payload = {
+                    abi     : entry.abi,
+                    code    : entry.code
+                };
+
+                me.wallet.unlockAccount(account, password).then(record => {
+                    const tx = TU.createTx(account, record.privKey, record.pubKey, 'contract.deploy', payload, entry.keys.address);
+                    me.client.send(tx).then(resolve).catch(reject);
+                }).catch(reject);
+
+            } else {
+                reject('Contract not found');
+            }
+
+        });
     }
 }
 

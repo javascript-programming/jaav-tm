@@ -19,7 +19,7 @@ if (options.rpc) {
         wallet.console = console;
 
         const Contracts = require('./wallet/contracts');
-        const contracts = new Contracts();
+        const contracts = new Contracts(wallet);
         contracts.console = console;
     });
 
