@@ -37,8 +37,16 @@ class Console {
     }
 
     askParam (param) {
+
+        let me = this;
+
         return new Promise((resolve, reject) => {
-            this.rl.question(`Param value for ${param} : `, (answer) => {
+
+            setTimeout( ()=> {
+                me.rl.output.write(' : ')
+            }, 200 );
+
+            this.rl.question(`Param value for ${param}`, (answer) => {
                 resolve(answer)
             });
         })
@@ -50,11 +58,13 @@ class Console {
         if (msg)
             console.log(msg);
 
-        // readline.showCursor(me.rl);
-
         return new Promise((resolve, reject) => {
 
-            me.rl.question('jaav-tm > ', async (answer) => {
+            setTimeout( ()=> {
+                me.rl.output.write(' > ')
+            }, 200 );
+
+            me.rl.question('jaav-tm', async (answer) => {
 
                 const fn = this.functions[answer];
 

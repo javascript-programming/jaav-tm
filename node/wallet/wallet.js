@@ -10,7 +10,7 @@ class Wallet {
         this.client = client;
         this.home = home || path.join(__dirname, '../../network');
 
-        this.walletPath = path.join(this.home, 'wallet');
+        this.walletPath = path.join(this.home, 'wallet.json');
         this.createWallet();
     }
 
