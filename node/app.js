@@ -33,6 +33,9 @@ if (options.rpc) {
     const WalletHandler = require('./handlers/wallet');
     abciServer.use(WalletHandler);
 
+    const ContractHandler = require('./handlers/contract');
+    abciServer.use(ContractHandler);
+
     const tendermintNode = new TendermintNode(options.home, options.node, options.tendermint, options.abci);
 
     abciServer.start(options.abci);

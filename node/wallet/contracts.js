@@ -4,10 +4,10 @@ const fs = require('fs');
 const stringify = require('json-stable-stringify');
 const Compiler = require('./compiler/contractcompiler');
 
-
 class Contracts {
 
     constructor (wallet) {
+        this.wallet = wallet;
         this.client = wallet.client;
         this.home = wallet.home;
 
@@ -27,6 +27,11 @@ class Contracts {
         console.setFunction('compile', {
             params : [],
             handler : () => { return me.compile(); }
+        });
+
+        console.setFunction('deploy', {
+            params : ['account', 'password', 'contract name'],
+            handler : (...params) => { return me.deploy.apply(me, params); }
         });
     }
 
@@ -102,12 +107,13 @@ class Contracts {
                 entry.keys = TU.createNewKeyAndAddress();
 
                 const payload = {
+                    name    : entry.name,
                     abi     : entry.abi,
                     code    : entry.code
                 };
 
                 me.wallet.unlockAccount(account, password).then(record => {
-                    const tx = TU.createTx(account, record.privKey, record.pubKey, 'contract.deploy', payload, entry.keys.address);
+                    const tx = TU.createTx(account, record.privKey, record.pubKey, 'contract.deploy_contract', payload, entry.keys.address);
                     me.client.send(tx).then(resolve).catch(reject);
                 }).catch(reject);
 
