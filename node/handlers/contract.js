@@ -42,6 +42,24 @@ class ContractHandler {
         return 'Contract deployed';
     }
 
+    static call_contract (state, tx) {
+
+        const contract = state.contracts[tx.to];
+
+        if (contract) {
+
+            if (!state.accounts[tx.account])
+                throw new Error('Caller account unknown');
+
+           // const fn =
+
+
+        } else {
+            throw new Error('Contract not found')
+        }
+
+    }
+
     //code almost the same as in wallet
     static transfer_funds (state, tx) {
 

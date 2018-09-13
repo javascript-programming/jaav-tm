@@ -21,7 +21,12 @@ class Contracts {
 
         console.setFunction('contracts', {
             params : [],
-            handler : () => { return Object.keys(me.contracts); }
+            handler : () => { return Object.keys(me.contracts).map(name => {
+                    let contract = { name };
+                    me.contracts[name].address && (contract.address = me.contracts[name].address);
+                    return contract;
+                });
+            }
         });
 
         console.setFunction('compile', {
@@ -31,7 +36,18 @@ class Contracts {
 
         console.setFunction('deploy', {
             params : ['account', 'password', 'contract name'],
-            handler : (...params) => { return me.deploy.apply(me, params); }
+            handler : (...params) => { return me.deploy.apply(me, params); },
+            async : true
+        });
+
+        console.setFunction('abi', {
+            params : ['address'],
+            handler : (...params) => { return me.getAbi.apply(me, params); }
+        });
+
+        console.setFunction('code', {
+            params : ['address'],
+            handler : (...params) => { return me.getCode.apply(me, params); }
         });
     }
 
@@ -114,14 +130,36 @@ class Contracts {
 
                 me.wallet.unlockAccount(account, password).then(record => {
                     const tx = TU.createTx(account, record.privKey, record.pubKey, 'contract.deploy_contract', payload, entry.keys.address);
-                    me.client.send(tx).then(resolve).catch(reject);
+                    me.client.send(tx).then((message) => {
+                        entry.deploys = entry.deploys || [];
+                        entry.deploys.push(entry.keys.address);
+                        entry.address = entry.keys.address;
+                        me.saveContractsStorage();
+                        resolve(message);
+                    }).catch(reject);
                 }).catch(reject);
 
             } else {
                 reject('Contract not found');
             }
-
         });
+    }
+
+    async getAbi (contract) {
+
+        return await this.client.query(`contracts/${contract}/abi`, {} ).catch((err) => {
+            console.log(err);
+        });
+    }
+
+    async getCode (contract) {
+
+        let code = await this.client.query(`contracts/${contract}/code`, {} ).catch((err) => {
+            console.log(err);
+        });
+
+        code = Buffer.from(code, 'base64').toString();
+        return code;
     }
 }
 
