@@ -11,9 +11,7 @@ class MyChat {
         if(this.state.members[account])
             throw new Error('Account already registered');
 
-        if (caller === account) {
-            transfer(account, owner, 1, 'Chat fee');
-
+        if (this.caller === account) {
             this.state.members[account] = name;
             this.state.members[account].messages = [];
         }
@@ -21,7 +19,7 @@ class MyChat {
 
     sendMessage (account, message, to, time) {
 
-        if (caller === account) {
+        if (this.caller === account) {
             const members = this.state.members;
 
             if (members[account] && members[to]) {
@@ -34,7 +32,7 @@ class MyChat {
 
     getMessages (account) {
 
-        if (caller === account) {
+        if (this.caller === account) {
 
             const members = this.state.members;
 
