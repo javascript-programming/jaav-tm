@@ -18,6 +18,10 @@ class Console {
         prompt.bind(this)();
     }
 
+    getFunctions () {
+        return this.functions;
+    }
+
     setFunction (name, fn) {
         this.functions[name] = fn;
 

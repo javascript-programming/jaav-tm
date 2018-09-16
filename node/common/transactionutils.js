@@ -2,6 +2,7 @@ const { createHash, randomBytes } = require('crypto');
 const stringify = require('json-stable-stringify');
 const base58check = require('bs58check');
 const secp = require('secp256k1');
+const uuidv1 = require('uuid/v1');
 
 function hashFunc (algo) {
     return (data) => createHash(algo).update(data).digest()
@@ -77,6 +78,7 @@ class TransActionUtils {
         return this.signTx({
             cmd     : cmd,
             account : account,
+            id      : uuidv1(),
             pubkey  : pubKey,
             params  : params || {},
             to      : to,

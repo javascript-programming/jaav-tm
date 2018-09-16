@@ -25,7 +25,7 @@ class WalletHandler {
 
         if (Number.isInteger(tx.value) && tx.value > 0) {
 
-            if (!state.accounts[tx.to] || !state.contracts[tx.to]) {
+            if (!state.accounts[tx.to] && !state.contracts[tx.to]) {
                 throw new Error('Be happy! No funds are lost while you have sent your funds into the blue.');
             }
 

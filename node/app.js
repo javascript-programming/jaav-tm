@@ -21,6 +21,8 @@ if (options.rpc) {
         const Contracts = require('./wallet/contracts');
         const contracts = new Contracts(wallet);
         contracts.console = console;
+
+        rpcServer.startServer(console.getFunctions());
     });
 
 } else {

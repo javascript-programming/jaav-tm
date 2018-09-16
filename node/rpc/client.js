@@ -80,7 +80,7 @@ class RPCClient {
 
         if (transaction) {
 
-            if (data.result.code === 0 || (data.result.response && !data.result.response.code)) {
+            if (data.result && (data.result.code === 0 || (data.result.response && !data.result.response.code))) {
                 transaction.resolve(data);
             } else {
                 transaction.reject(data);

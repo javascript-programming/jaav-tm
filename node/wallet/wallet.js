@@ -96,7 +96,7 @@ class Wallet {
         password = password || '1234';
         console.log('Account password');
 
-        const cryptr = new Cryptr(password);
+        const cryptr = new Cryptr(password.toString());
 
         this.wallet.accounts[keys.address] = {
             privKey : cryptr.encrypt(keys.privKey),
@@ -136,6 +136,7 @@ class Wallet {
         return new Promise((resolve, reject) => {
 
             password = password || '1234';
+            password = password.toString();
 
             account = account || this.wallet.account;
 
@@ -219,7 +220,11 @@ class Wallet {
 
             this.unlockAccount(account, password).then( record => {
                 let tx = TU.createTx(account, record.privKey, record.pubKey, 'wallet.transfer_funds', { message }, to, amount);
-                this.client.send(tx).then(resolve).catch(reject);
+                this.client.send(tx).then((result) => {
+                    resolve(result);
+                }).catch((err) => {
+                    reject(err);
+                });
             }).catch(reject);
         });
     }

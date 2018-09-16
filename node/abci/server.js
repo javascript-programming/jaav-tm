@@ -99,20 +99,7 @@ class ABCIServer {
     getCheckTxHandler () {
 
         const checkTx = (request) => {
-
-            try {
-
-                let transaction = this.getTransaction(request);
-
-                if (!TU.verifyTx(transaction))
-                    throw new Error('Signature not valid');
-
-                return { code: 0, log: 'tx succeeded'}
-
-            } catch (err) {
-                return { code: 1, log: err.message }
-            }
-
+            return this.getDeliveryTxHandler().deliverTx(request, true);
         };
 
         return { checkTx }
@@ -120,7 +107,7 @@ class ABCIServer {
 
     getDeliveryTxHandler () {
 
-        const deliverTx = (request) => {
+        const deliverTx = (request, clone) => {
 
             try {
                 let transaction = this.getTransaction(request);
@@ -128,8 +115,12 @@ class ABCIServer {
                 if (!TU.verifyTx(transaction))
                     throw new Error('Signature not valid');
 
+                const state = !clone ? this.stateManager.state : TU.clone(this.stateManager.state);
+
                 const handler = this.getHandler(transaction);
-                return { code: 0, log: handler(this.stateManager.state, transaction, this.stateManager.chainInfo) || 'tx succeeded'}
+                const log = handler(state, transaction, this.stateManager.chainInfo);
+                return { code: 0, log: log || 'tx succeeded'}
+
 
             } catch (err) {
                 return { code: 1, log: err.message }
