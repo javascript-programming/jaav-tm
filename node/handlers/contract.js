@@ -1,6 +1,27 @@
 const CU = require('../common/contractutils');
 const TU = require('../common/transactionutils');
 
+function executeContract (contract, state, fn, params, account, value) {
+
+    if (contract.abi[fn]) {
+
+        const code = Buffer.from(contract.code, 'base64').toString();
+        const Cls = CU.getClass(code);
+        const instance = new Cls(state);
+
+        instance.caller = account;
+        instance.value = value;
+
+        return {
+            result : instance[fn].apply(instance, params),
+            state  : instance.state
+        }
+
+    } else {
+        throw new Error('Function not found in contract');
+    }
+}
+
 class ContractHandler {
 
     static getNameSpace () {
@@ -25,13 +46,17 @@ class ContractHandler {
 
             let message = 'Initial funds from ' + tx.account;
 
+            const Cls = CU.getClass(Buffer.from(tx.params.code, 'base64').toString());
+            const instance = new Cls();
+            const initialState = instance.state || {};
+
             state.contracts[tx.to] = {
                 balance     : value,
                 cashbook    : value > 0 ? [{ from: tx.account, amount: value, message }] :[],
                 name        : tx.params.name,
                 abi         : tx.params.abi,
                 code        : tx.params.code,
-                state       : {}
+                state       : initialState
             };
 
             if (value > 0) {
@@ -55,11 +80,9 @@ class ContractHandler {
             if (!state.accounts[tx.account])
                 throw new Error('Caller account unknown');
 
-            if (!state.accounts[account])
-                throw new Error('Caller account unknown');
-
-            return ContractHandler.execute(contract, contract.state, fn, tx.params, account);
-
+            //todo check value and balance sender
+            executeContract(contract, contract.state, tx.params.fn, tx.params.params, tx.account, tx.value);
+            return 'Contract call executed';
 
         } else {
             throw new Error('Contract not found')
@@ -74,28 +97,13 @@ class ContractHandler {
                 throw new Error('Caller account unknown');
 
             const immutableState = TU.clone(contract.state);
-            return ContractHandler.execute(contract, immutableState, fn, params, account);
+            return executeContract(contract, immutableState, fn, params, account).result;
 
         } else {
             throw new Error('Contract not found')
         }
     }
 
-    static execute (contract, state, fn, params, account) {
-
-        if (contract.abi[fn]) {
-
-            const code = Buffer.from(contract.code, 'base64').toString();
-            const Cls = CU.getClass(code);
-
-            const instance = new Cls(state);
-            instance.caller = account;
-            return instance[fn].apply(instance, params);
-
-        } else {
-            throw new Error('Function not found in contract');
-        }
-    }
 
     //code almost the same as in wallet
     static transfer_funds (state, tx) {

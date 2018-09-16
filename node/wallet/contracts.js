@@ -47,13 +47,19 @@ class Contracts {
         });
 
         console.setFunction('code', {
-            params : ['address'],
+            params  : ['address'],
             handler : (...params) => { return me.getCode.apply(me, params); }
         });
 
         console.setFunction('queryContract', {
-            params : ['account', 'address', 'function name', 'params'],
+            params  : ['account', 'address', 'function name', 'params'],
             handler : (...params) => { return me.queryContract.apply(me, params); }
+        });
+
+        console.setFunction('callContract', {
+            params  : ['account', 'password', 'address', 'function name', 'value', 'params'],
+            handler : (...params) => { return me.callContract.apply(me, params); },
+            async   : true
         });
     }
 
@@ -170,6 +176,30 @@ class Contracts {
         return await this.client.query(`contracts/${address}`, { account, params, fn }).catch((err) => {
             console.log(err);
         });
+    }
+
+    callContract (account, password, address, fn, value, ...params) {
+
+        if (typeof params === 'string' || params instanceof String) {
+            params = params.split(',');
+        }
+
+        const me = this;
+
+        const payload = {
+            fn      : fn,
+            params  : params
+        };
+
+        return new Promise((resolve, reject) => {
+            me.wallet.unlockAccount(account, password).then(record => {
+                const tx = TU.createTx(account, record.privKey, record.pubKey, 'contract.call_contract', payload, address);
+                me.client.send(tx).then((message) => {
+                    resolve(message);
+                }).catch(reject);
+            }).catch(reject);
+        });
+
     }
 }
 
