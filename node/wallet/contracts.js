@@ -51,6 +51,11 @@ class Contracts {
             handler : (...params) => { return me.getCode.apply(me, params); }
         });
 
+        console.setFunction('state', {
+            params  : ['address'],
+            handler : (...params) => { return me.getState.apply(me, params); }
+        });
+
         console.setFunction('queryContract', {
             params  : ['account', 'address', 'function name', 'params'],
             handler : (...params) => { return me.queryContract.apply(me, params); }
@@ -165,6 +170,15 @@ class Contracts {
         });
 
         return Buffer.from(code, 'base64').toString();
+    }
+
+    async getState (contract) {
+
+        let state = await this.client.query(`contracts/${contract}/state`, {} ).catch((err) => {
+            console.log(err);
+        });
+
+        return state;
     }
 
     async queryContract (account, address, fn, ...params) {

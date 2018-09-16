@@ -30,14 +30,18 @@ class RPCServer {
         });
 
         app.get('/accounts', this.getAccounts.bind(this));
-        app.get('/account/:account/balance', this.getAccountBalance.bind(this));
-
-        app.post('/account/create', this.createAccount.bind(this));
-
-        app.post('/account/:account/transfer/:to', this.transfer.bind(this));
+        app.get('/accounts/:account/balance', this.getAccountBalance.bind(this));
+        app.post('/accounts/create', this.createAccount.bind(this));
+        app.post('/accounts/:account/transfer/:to', this.transfer.bind(this));
 
         app.get('/contracts', this.getContracts.bind(this));
-        app.post('/contract/:contract/:account/:method', this.handleContract.bind(this));
+        app.post('/contracts/:account/deploy/:name', this.deployContract.bind(this));
+        app.get('/contracts/:address/abi', this.getAbi.bind(this));
+        app.get('/contracts/:address/code', this.getCode.bind(this));
+        app.post('/contracts/:address/:account/:method/call', this.callContract.bind(this));
+        app.post('/contracts/:address/:account/:method/get', this.queryContract.bind(this));
+
+        app.get('/contracts/:address/state', this.getContractState.bind(this));
 
         this.http = http.createServer(app);
         this.http.listen(this.rpcPort, () => {
@@ -79,9 +83,9 @@ class RPCServer {
 
         try {
             res.send({
-                    success :true,
-                    result: await this.middleware['transfer'].handler(account, to, value, message, password)
-                });
+                success :true,
+                result: await this.middleware['transfer'].handler(account, to, value, message, password)
+            });
         } catch (err) {
             res.send({
                 success: false,
@@ -99,12 +103,99 @@ class RPCServer {
         });
     }
 
-    handleAccount (req, res) {
-        debugger
+    async deployContract (req, res) {
+
+        await this.middleware['compile'].handler();
+
+        const account   = req.params.account;
+        const name      = req.params.name;
+        const password  = req.body.password;
+
+        try {
+            res.send({
+                success : true,
+                result  : await this.middleware['deploy'].handler(account, password, name)
+            })
+        } catch (err) {
+            res.send({
+                success : false,
+                message : err
+            });
+        }
     }
 
-    handleContract (req, res) {
-        debugger
+    async getAbi (req, res) {
+
+        let result = await this.middleware['abi'].handler(req.params.address);
+        res.send({
+            success : result ? true : false,
+            result  : result || 'Not found'
+        });
+    }
+
+    async getCode (req, res) {
+
+        let result = await this.middleware['code'].handler(req.params.address);
+        res.send({
+            success : result ? true : false,
+            result  : result || 'Not found'
+        });
+    }
+
+
+    async callContract (req, res) {
+
+        const account = req.params.account;
+        const password = req.body.password;
+        const address = req.params.address;
+        const fn = req.params.method;
+        const value = 0;
+        const params = req.body.params;
+
+        let result = await this.middleware['callContract'].handler(account, password, address, fn, value, params);
+
+        try {
+            res.send({
+                success: true,
+                result : result
+            });
+        } catch (err) {
+            res.send({
+                success: false,
+                result : err
+            });
+        }
+    }
+
+    async queryContract (req, res) {
+
+        const account = req.params.account;
+        const address = req.params.address;
+        const fn = req.params.method;
+        const params = req.body.params;
+
+        let result = await this.middleware['queryContract'].handler(account, address, fn, params);
+
+        try {
+            res.send({
+                success: true,
+                result : result
+            });
+        } catch (err) {
+            res.send({
+                success: false,
+                result : err
+            });
+        }
+    }
+
+    async getContractState (req, res) {
+
+        let result = await this.middleware['state'].handler(req.params.address);
+        res.send({
+            success : result ? true : false,
+            result  : result || 'Not found'
+        });
     }
 }
 
