@@ -115,6 +115,16 @@ class TransActionUtils {
         }
     }
 
+    static parseJson (buffer) {
+
+        try {
+            return JSON.parse(buffer.toString());
+        }
+        catch (err){
+            return buffer;
+        }
+    }
+
     static convertObjectToBase64 (obj) {
         return Buffer.from(stringify(obj)).toString('base64');
     }
@@ -124,6 +134,7 @@ class TransActionUtils {
     }
 
     static signTx (tx, privKey) {
+
         let stx = this.getSigMsg(tx);
         tx.signature = this.signByAccount(stx, privKey);
         return tx;

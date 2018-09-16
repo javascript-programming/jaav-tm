@@ -1,5 +1,6 @@
 const TU = require('../common/transactionutils');
 const stringify = require('json-stable-stringify');
+const ContractHandler = require('../handlers/contract');
 
 class StateManager {
 
@@ -50,7 +51,16 @@ class StateManager {
 
         try {
             const data = this.getPathData(path);
-            result.value = Buffer.from(stringify(data));
+            const params = TU.parseJson(Buffer.from(request.data));
+
+            if (params.fn) {
+                result.value = ContractHandler.query_contract(this.state, params.account, data, params.fn, params.params);
+            } else {
+                result.value = data;
+            }
+
+            result.value = Buffer.from(stringify(result.value));
+
             result.proof = TU.sha256(result.value);
             result.code = 0;
         } catch (err) {

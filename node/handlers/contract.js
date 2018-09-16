@@ -1,3 +1,6 @@
+const CU = require('../common/contractutils');
+const TU = require('../common/transactionutils');
+
 class ContractHandler {
 
     static getNameSpace () {
@@ -27,7 +30,8 @@ class ContractHandler {
                 cashbook    : value > 0 ? [{ from: tx.account, amount: value, message }] :[],
                 name        : tx.params.name,
                 abi         : tx.params.abi,
-                code        : tx.params.code
+                code        : tx.params.code,
+                state       : {}
             };
 
             if (value > 0) {
@@ -51,13 +55,46 @@ class ContractHandler {
             if (!state.accounts[tx.account])
                 throw new Error('Caller account unknown');
 
-           // const fn =
+            if (!state.accounts[account])
+                throw new Error('Caller account unknown');
+
+            return ContractHandler.execute(contract, contract.state, fn, tx.params, account);
 
 
         } else {
             throw new Error('Contract not found')
         }
+    }
 
+    static query_contract (state, account, contract, fn, params) {
+
+        if (contract) {
+
+            if (!state.accounts[account])
+                throw new Error('Caller account unknown');
+
+            const immutableState = TU.clone(contract.state);
+            return ContractHandler.execute(contract, immutableState, fn, params, account);
+
+        } else {
+            throw new Error('Contract not found')
+        }
+    }
+
+    static execute (contract, state, fn, params, account) {
+
+        if (contract.abi[fn]) {
+
+            const code = Buffer.from(contract.code, 'base64').toString();
+            const Cls = CU.getClass(code);
+
+            const instance = new Cls(state);
+            instance.caller = account;
+            return instance[fn].apply(instance, params);
+
+        } else {
+            throw new Error('Function not found in contract');
+        }
     }
 
     //code almost the same as in wallet

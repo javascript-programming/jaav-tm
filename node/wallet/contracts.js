@@ -1,4 +1,5 @@
 const TU = require('../common/transactionutils');
+const CU = require('../common/contractutils');
 const path = require('path');
 const fs = require('fs');
 const stringify = require('json-stable-stringify');
@@ -49,6 +50,11 @@ class Contracts {
             params : ['address'],
             handler : (...params) => { return me.getCode.apply(me, params); }
         });
+
+        console.setFunction('queryContract', {
+            params : ['account', 'address', 'function name', 'params'],
+            handler : (...params) => { return me.queryContract.apply(me, params); }
+        });
     }
 
     createContractStorage () {
@@ -65,12 +71,6 @@ class Contracts {
         fs.writeFileSync(this.contractWalletPath, stringify(this.contracts));
     }
 
-    static getClass (cls) {
-        let result;
-        eval('result = ' + cls);
-        return result;
-    }
-
     compile () {
         let content = fs.readdirSync(this.contractSourceFolder);
 
@@ -83,7 +83,7 @@ class Contracts {
             let entry;
 
             try {
-                let contract = Compiler.compile(Contracts.getClass(cls));
+                let contract = Compiler.compile(CU.getClass(cls));
 
                 if (!this.contracts[contract.name]) {
                     this.contracts[contract.name] = contract;
@@ -158,8 +158,18 @@ class Contracts {
             console.log(err);
         });
 
-        code = Buffer.from(code, 'base64').toString();
-        return code;
+        return Buffer.from(code, 'base64').toString();
+    }
+
+    async queryContract (account, address, fn, ...params) {
+
+        if (typeof params === 'string' || params instanceof String) {
+            params = params.split(',');
+        }
+
+        return await this.client.query(`contracts/${address}`, { account, params, fn }).catch((err) => {
+            console.log(err);
+        });
     }
 }
 
