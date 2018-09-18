@@ -1,4 +1,7 @@
 const http = require('http');
+const WebSocket = require('./websocket');
+const serveStatic = require('serve-static');
+const path = require('path');
 
 class HttpServer {
 
@@ -20,13 +23,24 @@ class HttpServer {
 
         app.get('/contracts/:address/state', this.getContractState.bind(this));
 
+        app.use('/page', serveStatic(path.join(__dirname, '../../page')));
+
         this.http = http.createServer(app);
     }
 
-    startServer (rpcPort) {
+    getServer () {
+        return this.http;
+    }
+
+    startServer (rpcPort, client) {
+
+        this.webSocket = new WebSocket(this.http, this.middleware);
+
         this.http.listen(rpcPort, () => {
             console.log('Rpc server is listening on port ' + rpcPort);
         });
+
+        this.webSocket.openSocket(client);
     }
 
     async getAccounts (req, res) {
