@@ -25,13 +25,13 @@ class WebSocket {
                         success : true,
                         id      : request.id,
                         result  : result
-                    })).catch(err => {
-                        ws.send(JSON.stringify({
-                            success : false,
-                            id      : request.id,
-                            error   : err
-                        }));
-                    });
+                    }))
+                }).catch(err => {
+                    ws.send(JSON.stringify({
+                        success : false,
+                        id      : request.id,
+                        error   : err
+                    }));
                 });
 
             });
