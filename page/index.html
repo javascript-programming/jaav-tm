@@ -2,10 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Jaav-tm</title>
     <script src="client.js"></script>
 </head>
 <body>
+<script>
 
+    const webclient = new WebClient('ws://localhost:3000');
+    webclient.connect().then(async () => {
+        let accounts = await webclient.getAccounts();
+        console.log(accounts);
+        let balance = await webclient.getBalance(accounts[0]);
+        console.log(balance);
+        let newAccount = await webclient.createAccount('1234');
+        console.log(newAccount);
+        let transfer = await webclient.transfer(accounts[0], accounts[3], 1, 'Test', '1234').catch(err => {
+            console.log(err) });
+        console.log(transfer);
+    });
+
+</script>
 </body>
 </html>

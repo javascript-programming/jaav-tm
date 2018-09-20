@@ -7,6 +7,12 @@ class WebClient {
         this.requests = {};
     }
 
+    fromHex (hex) {
+       return hex.toString().match(/.{1,2}/g).map(function(v){
+            return String.fromCharCode(parseInt(v, 16));
+        }).join('');
+    }
+
     connect () {
 
         return new Promise ((resolve, reject) => {
@@ -18,19 +24,25 @@ class WebClient {
                 resolve();
             };
 
-            ws.onmessage = (data) => {
-                const result = JSON.parse(data.data);
-                const request = this.requests[result.id];
+            ws.onmessage = (message) => {
+                const response = JSON.parse(message.data);
+                const request = this.requests[response.id];
 
                 if (request) {
-                    if (result.success) {
-                        request.resolve(result.result);
+                    if (response.success) {
+
+                        if (response.result.data) {
+                            response.result.data = JSON.parse(this.fromHex(response.result.data));
+                        }
+
+                        request.resolve(response.result);
+
                     } else {
-                        request.reject(result.error);
+                        request.reject(response.error);
                     }
                 }
 
-                delete this.requests[result.id];
+                delete this.requests[response.id];
             };
         });
     }
@@ -62,27 +74,17 @@ class WebClient {
         return webclient.makeRequest('getBalance', account);
     }
 
-    createAccount (password) {
-        return webclient.makeRequest('createAccount', password);
+    async createAccount (password) {
+        const result = await webclient.makeRequest('createAccount', password);
+        return result.data;
     }
 
-    transfer (account, to, amount, message, password) {
-        return webclient.makeRequest('transfer', account, to, amount, message, password);
+    async transfer (account, to, amount, message, password) {
+        const result = await webclient.makeRequest('transfer', account, to, amount, message, password);
+        return result.data;
     }
 
     changePassword (account, oldPassword, newPassword) {
         return webclient.makeRequest('changePassword', account, oldPassword, newPassword);
     }
 }
-
-const webclient = new WebClient('ws://localhost:3000');
-webclient.connect().then(async () => {
-    let accounts = await webclient.getAccounts();
-    let balance = await webclient.getBalance(accounts[0]);
-    console.log(accounts);
-    console.log(balance);
-    let newAccount = await webclient.createAccount('1234');
-    console.log(newAccount);
-    let transfer = await webclient.transfer(accounts[0], accounts[3], 1, 'Test', '1234').catch(err => {
-        console.log(err) });
-});

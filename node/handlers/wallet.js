@@ -17,7 +17,13 @@ class WalletHandler {
             cashbook: []
         };
 
-        return 'Account created';
+        return {
+            log     : 'Account created',
+            result  : {
+                address : tx.params.account,
+                balance : state.accounts[tx.params.account].balance
+            }
+        }
     }
 
     //code almost the sa,e as in contract
@@ -51,7 +57,10 @@ class WalletHandler {
             throw new Error('Value should be positive integer');
         }
 
-        return 'Balance updated';
+        return {
+            log     : 'Balance updated',
+            result  : state.accounts[tx.account]
+        };
     }
 }
 

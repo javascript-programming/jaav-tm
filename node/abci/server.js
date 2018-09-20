@@ -118,8 +118,8 @@ class ABCIServer {
                 const state = !clone ? this.stateManager.state : TU.clone(this.stateManager.state);
 
                 const handler = this.getHandler(transaction);
-                const log = handler(state, transaction, this.stateManager.chainInfo);
-                return { code: 0, log: log || 'tx succeeded'}
+                const receipt = handler(state, transaction, this.stateManager.chainInfo);
+                return { code: 0, log: receipt.log || 'tx succeeded', data : Buffer.from(stringify(receipt.result)) }
 
 
             } catch (err) {

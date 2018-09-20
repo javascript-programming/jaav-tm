@@ -24,7 +24,7 @@ class WebSocket {
                     ws.send(JSON.stringify({
                         success : true,
                         id      : request.id,
-                        result  : result
+                        result  : result.result || result
                     }))
                 }).catch(err => {
                     ws.send(JSON.stringify({

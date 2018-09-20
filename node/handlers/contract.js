@@ -68,7 +68,14 @@ class ContractHandler {
             throw new Error('Insufficient funds you have!');
         }
 
-        return 'Contract deployed';
+        return {
+            log     : 'Contract deployed',
+            result  : {
+                address: tx.to,
+                abi    : tx.params.abi,
+                owner  : tx.account
+            }
+        };
     }
 
     static call_contract (state, tx) {
@@ -81,9 +88,11 @@ class ContractHandler {
                 throw new Error('Caller account unknown');
 
             //todo check value and balance sender
-            executeContract(contract, contract.state, tx.params.fn, tx.params.params, tx.account, tx.value);
-            return 'Contract call executed';
-
+            const result = executeContract(contract, contract.state, tx.params.fn, tx.params.params, tx.account, tx.value);
+            return {
+                log     : 'Contract call executed',
+                result  : result.result
+            }
         } else {
             throw new Error('Contract not found')
         }
@@ -136,7 +145,10 @@ class ContractHandler {
             throw new Error('Value should be positive integer');
         }
 
-        return 'Contract balance updated';
+        return {
+            log     : 'Contract balance updated',
+            result  : state.contracts[tx.account].balance
+        };
     }
 
 }
