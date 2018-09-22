@@ -1,3 +1,5 @@
-window.WebClient = require('./client');
+import { WebClient} from "./client.js";
+
+window.WebClient = WebClient;
 
 
