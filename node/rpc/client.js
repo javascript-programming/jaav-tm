@@ -6,9 +6,7 @@ const TU = require('../common/transactionutils');
 class RPCClient {
 
     constructor (rpcPort = 46657) {
-
         this.wsRpcUrl = 'ws://localhost:' + rpcPort + '/websocket';
-
         this.transactions = {};
     }
 

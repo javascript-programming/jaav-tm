@@ -8,7 +8,7 @@ class WebClient {
     }
 
     fromHex (hex) {
-       return hex.toString().match(/.{1,2}/g).map(function(v){
+        return hex.toString().match(/.{1,2}/g).map(function(v){
             return String.fromCharCode(parseInt(v, 16));
         }).join('');
     }
@@ -67,24 +67,26 @@ class WebClient {
     }
 
     getAccounts () {
-        return webclient.makeRequest('accounts');
+        return this.makeRequest('accounts');
     }
 
     getBalance (account) {
-        return webclient.makeRequest('getBalance', account);
+        return this.makeRequest('getBalance', account);
     }
 
     async createAccount (password) {
-        const result = await webclient.makeRequest('createAccount', password);
+        const result = await this.makeRequest('createAccount', password);
         return result.data;
     }
 
     async transfer (account, to, amount, message, password) {
-        const result = await webclient.makeRequest('transfer', account, to, amount, message, password);
+        const result = await this.makeRequest('transfer', account, to, amount, message, password);
         return result.data;
     }
 
     changePassword (account, oldPassword, newPassword) {
-        return webclient.makeRequest('changePassword', account, oldPassword, newPassword);
+        return this.makeRequest('changePassword', account, oldPassword, newPassword);
     }
 }
+
+!window.devmode && (module.exports = WebClient);
