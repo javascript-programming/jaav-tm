@@ -19,6 +19,12 @@
              let transfer = await webclient.transfer(accounts[0], accounts[3], 1, 'Test', '1234').catch(err => {
                  console.log(err) });
              console.log(transfer);
+             let compile = await webclient.compile();
+             console.log(compile);
+             let contracts = await webclient.getContracts();
+             console.log(contracts);
+             let deploy = await webclient.deploy(accounts[0], '1234', contracts[1].name);
+             console.log(deploy);
          });
      });
 

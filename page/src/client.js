@@ -27,6 +27,19 @@ class WebClient extends ClientBase {
     changePassword (account, oldPassword, newPassword) {
         return this.makeRequest('changePassword', account, oldPassword, newPassword);
     }
+
+    getContracts () {
+        return this.makeRequest('contracts');
+    }
+
+    compile () {
+        return this.makeRequest('compile');
+    }
+
+    async deploy (account, password, contract) {
+        const result = await this.makeRequest('deploy', account, password, contract);
+        return result.data;
+    }
 }
 
 export { WebClient }
