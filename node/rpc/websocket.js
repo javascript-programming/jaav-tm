@@ -30,7 +30,7 @@ class WebSocket {
                     ws.send(JSON.stringify({
                         success : false,
                         id      : request.id,
-                        error   : err
+                        message : err.message || err
                     }));
                 });
 

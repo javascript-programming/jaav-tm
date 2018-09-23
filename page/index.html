@@ -23,8 +23,14 @@
              console.log(compile);
              let contracts = await webclient.getContracts();
              console.log(contracts);
-             let deploy = await webclient.deploy(accounts[0], '1234', contracts[1].name);
+             let deploy = await webclient.deploy(accounts[0], '1234', 'HelloWorld');
              console.log(deploy);
+             //todo listen to some event when state is updated, checkTx is executed while deliverTx is updating
+             setTimeout(async () => {
+                 let contract = await webclient.getContract(deploy.address, accounts[0], '1234');
+                 let result = await contract.setGreeting('Moi');
+                 console.log(result);
+             }, 300);
          });
      });
 

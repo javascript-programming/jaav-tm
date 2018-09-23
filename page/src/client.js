@@ -1,4 +1,5 @@
 import { ClientBase } from "./base.js";
+import { ClientContract } from "./contract.js";
 
 class WebClient extends ClientBase {
 
@@ -39,6 +40,16 @@ class WebClient extends ClientBase {
     async deploy (account, password, contract) {
         const result = await this.makeRequest('deploy', account, password, contract);
         return result.data;
+    }
+
+    async getContract (address, account, password) {
+
+        try {
+            const abi = await this.makeRequest('abi', address);
+            return new ClientContract(this, address, abi, account, password);
+        } catch (err) {
+            return err;
+        }
     }
 }
 

@@ -119,7 +119,7 @@ class ABCIServer {
 
                 const handler = this.getHandler(transaction);
                 const receipt = handler(state, transaction, this.stateManager.chainInfo);
-                return { code: 0, log: receipt.log || 'tx succeeded', data : Buffer.from(stringify(receipt.result)) }
+                return { code: 0, log: receipt.log || 'tx succeeded', data : Buffer.from(stringify(receipt.result || {})) }
 
 
             } catch (err) {

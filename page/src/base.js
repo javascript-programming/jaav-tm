@@ -38,7 +38,7 @@ class ClientBase {
                         request.resolve(response.result);
 
                     } else {
-                        request.reject(response.error);
+                        request.reject(response);
                     }
                 }
 

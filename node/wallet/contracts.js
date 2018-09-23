@@ -160,6 +160,7 @@ class Contracts {
 
         return await this.client.query(`contracts/${contract}/abi`, {} ).catch((err) => {
             console.log(err);
+            throw new Error(err);
         });
     }
 
@@ -174,11 +175,9 @@ class Contracts {
 
     async getState (contract) {
 
-        let state = await this.client.query(`contracts/${contract}/state`, {} ).catch((err) => {
+        return await this.client.query(`contracts/${contract}/state`, {} ).catch((err) => {
             console.log(err);
         });
-
-        return state;
     }
 
     async queryContract (account, address, fn, ...params) {
