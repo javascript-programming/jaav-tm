@@ -42,11 +42,11 @@ class WebClient extends ClientBase {
         return result.data;
     }
 
-    async getContract (address, account, password) {
+    async getContract (address, account) {
 
         try {
             const abi = await this.makeRequest('abi', address);
-            return new ClientContract(this, address, abi, account, password);
+            return new ClientContract(this, address, abi, account);
         } catch (err) {
             return err;
         }
