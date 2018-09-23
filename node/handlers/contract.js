@@ -14,7 +14,11 @@ function executeContract (contract, state, fn, params, account, value) {
 
         return {
             result : instance[fn].apply(instance, params),
-            state  : instance.state
+            state  : instance.state,
+            tags   : [
+                { key : Buffer.from('jv.contract'), value : Buffer.from(contract.address) },
+                { key : Buffer.from('jv.event'), value : Buffer.from(fn) }
+            ]
         }
 
     } else {
@@ -52,6 +56,7 @@ class ContractHandler {
 
             state.contracts[tx.to] = {
                 balance     : value,
+                address     : tx.to,
                 cashbook    : value > 0 ? [{ from: tx.account, amount: value, message }] :[],
                 name        : tx.params.name,
                 abi         : tx.params.abi,
@@ -91,7 +96,8 @@ class ContractHandler {
             const result = executeContract(contract, contract.state, tx.params.fn, tx.params.params, tx.account, tx.value);
             return {
                 log     : 'Contract call executed',
-                result  : result.result
+                result  : result.result,
+                tags    : result.tags
             }
         } else {
             throw new Error('Contract not found')

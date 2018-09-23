@@ -110,16 +110,26 @@ class ABCIServer {
         const deliverTx = (request, clone) => {
 
             try {
-                let transaction = this.getTransaction(request);
+                const transaction = this.getTransaction(request);
 
                 if (!TU.verifyTx(transaction))
                     throw new Error('Signature not valid');
 
                 const state = !clone ? this.stateManager.state : TU.clone(this.stateManager.state);
-
                 const handler = this.getHandler(transaction);
                 const receipt = handler(state, transaction, this.stateManager.chainInfo);
-                return { code: 0, log: receipt.log || 'tx succeeded', data : Buffer.from(stringify(receipt.result || {})) }
+                let tags = [];
+
+                if (!clone && receipt.tags) {
+                    tags = receipt.tags;
+                }
+
+                return {
+                    code    : 0,
+                    log     : receipt.log || 'tx succeeded',
+                    tags    : tags,
+                    data    : Buffer.from(stringify(receipt.result || {}))
+                }
 
 
             } catch (err) {

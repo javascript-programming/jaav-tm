@@ -66,6 +66,13 @@ class Contracts {
             handler : (...params) => { return me.callContract.apply(me, params); },
             async   : true
         });
+
+        console.setFunction('subscribe', {
+            params  : ['address', 'handler', 'websocket'],
+            handler : (...params) => { return me.subscribe.apply(me, params); },
+            hidden  : true
+        });
+
     }
 
     createContractStorage () {
@@ -83,9 +90,9 @@ class Contracts {
     }
 
     compile () {
-        let content = fs.readdirSync(this.contractSourceFolder);
+        const content = fs.readdirSync(this.contractSourceFolder);
 
-        let result = [];
+        const result = [];
 
         for (let i = 0; i < content.length; i++) {
             let contractPath = path.join(this.contractSourceFolder, content[i]);
@@ -94,7 +101,7 @@ class Contracts {
             let entry;
 
             try {
-                let contract = Compiler.compile(CU.getClass(cls));
+                const contract = Compiler.compile(CU.getClass(cls));
 
                 if (!this.contracts[contract.name]) {
                     this.contracts[contract.name] = contract;
@@ -109,6 +116,7 @@ class Contracts {
                     delete entry.address;
                     result.push(entry.name);
                 }
+
             } catch (err) {
                 console.log(err.message);
             }
@@ -178,6 +186,10 @@ class Contracts {
         return await this.client.query(`contracts/${contract}/state`, {} ).catch((err) => {
             console.log(err);
         });
+    }
+
+    async subscribe (address, handler, ws) {
+        return await this.client.subscribe(address, handler, ws);
     }
 
     async queryContract (account, address, fn, ...params) {

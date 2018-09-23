@@ -5,6 +5,7 @@ class ClientContract {
 
         this._client = client;
         delete abi.constructor;
+        this._address = address;
 
         const generateFunction = (target, fn, params) => {
             const body = {};
@@ -20,7 +21,7 @@ class ClientContract {
             }
 
             eval(`body[fn] = function (${params.join(', ')} ${ isCall ? ', password' : '' }) {
-                return this._client.makeRequest('${method}', ${ initialParams.join(',') }, ${ params.join(',')});
+                return this._client.makeRequest('${method}', ${ initialParams.join(',') }, ${ params.join(',') });
              }`);
 
             Object.assign(target, body);
@@ -29,6 +30,7 @@ class ClientContract {
         Object.keys(abi).forEach(function(key) {
             generateFunction(this, key, abi[key]);
         }, this);
+
     }
 }
 

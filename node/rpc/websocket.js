@@ -8,10 +8,13 @@ class WebSocket {
     }
 
     openSocket (client) {
+        this.client = client;
         this.addListeners(new WS.Server({ server : this.server }), client);
     }
 
     addListeners (wss, client) {
+
+        const me = this;
 
         wss.on('connection', (ws) => {
 
@@ -20,7 +23,14 @@ class WebSocket {
             ws.on('message', async (data) => {
                 const request = JSON.parse(data);
 
-                this.middleware[request.cmd].handler(...request.params).then(result => {
+                let handler, client = null;
+
+                if (request.cmd === 'subscribe') {
+                    handler = this.handler.bind(me);
+                    client = ws;
+                }
+
+                this.middleware[request.cmd].handler(...request.params, handler, client).then(result => {
                     ws.send(JSON.stringify({
                         success : true,
                         id      : request.id,
@@ -33,13 +43,16 @@ class WebSocket {
                         message : err.message || err
                     }));
                 });
-
             });
 
             ws.on('close', () => {
                 console.log('ws disconnected');
             });
         });
+    }
+
+    handler (message, ws) {
+
     }
 }
 

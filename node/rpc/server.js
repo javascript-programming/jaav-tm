@@ -31,8 +31,6 @@ class RPCServer {
 
         this.httpServer = new HttpServer(app, this.middleware);
         this.httpServer.startServer(this.rpcPort, this.client);
-
-
     }
 }
 

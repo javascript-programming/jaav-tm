@@ -74,7 +74,7 @@ class Console {
 
                 const fn = this.functions[answer];
 
-                if (fn) {
+                if (fn && !fn.hidden) {
 
                     const params = fn.params.slice();
                     let answers = [];

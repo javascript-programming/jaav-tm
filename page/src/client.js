@@ -43,13 +43,8 @@ class WebClient extends ClientBase {
     }
 
     async getContract (address, account) {
-
-        try {
-            const abi = await this.makeRequest('abi', address);
-            return new ClientContract(this, address, abi, account);
-        } catch (err) {
-            return err;
-        }
+        const abi = await this.makeRequest('abi', address);
+        return await this.registerContract(new ClientContract(this, address, abi, account));
     }
 }
 

@@ -8,6 +8,7 @@ class RPCClient {
     constructor (rpcPort = 46657) {
         this.wsRpcUrl = 'ws://localhost:' + rpcPort + '/websocket';
         this.transactions = {};
+        this.subscriptions = {};
     }
 
     connect () {
@@ -25,6 +26,33 @@ class RPCClient {
             }
         });
 
+    }
+
+    subscribe (contract, handler, clientSocket) {
+        return new Promise((resolve, reject) => {
+
+            const id = uuidv1();
+
+            const subscribeFn = (ws) => {
+                let call = {
+                    "jsonrpc": "2.0",
+                    "method" : "subscribe",
+                    "id"     : id,
+                    "params" : {
+                        "query": "tm.event = 'Tx' AND jv.contract = '" + contract + "'"
+                    }
+                };
+                ws.send(stringify(call));
+            };
+
+            this.subscriptions[id] = { resolve, handler, subscribeFn, client : clientSocket };
+            subscribeFn(this.ws);
+
+            clientSocket.on('close', () => {
+                delete this.subscriptions[id];
+                //todo and unsubscribe from tendermint
+            });
+        });
     }
 
     send (tx) {
@@ -74,7 +102,7 @@ class RPCClient {
     onMessage (data) {
         data = JSON.parse(data);
 
-        let transaction = this.transactions[data.id];
+        const transaction = this.transactions[data.id];
 
         if (transaction) {
 
@@ -85,6 +113,18 @@ class RPCClient {
             }
 
            delete this.transactions[data.id];
+        }
+
+        const subscription = this.subscriptions[data.id.replace('#event', '')];
+
+        if (subscription) {
+            if (subscription.resolve) {
+                subscription.resolve(data);
+                //todo handle reject
+                delete subscription.resolve;
+            } else {
+                subscription.handler(data, subscription.client);
+            }
         }
     }
 
@@ -99,6 +139,10 @@ class RPCClient {
         this.ready = true;
         this.ws.on('message', this.onMessage.bind(this));
         this.ws.on('close', this.onClose.bind(this));
+        Object.keys(this.subscriptions).forEach(key => {
+            this.subscriptions[key].subscribeFn(this.ws);
+        }, this);
+
         cb();
     }
 }

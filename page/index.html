@@ -29,7 +29,6 @@
              setTimeout(async () => {
                  let contract = await webclient.getContract(deploy.address, accounts[0], '1234');
                  let result = await contract.setGreeting('Moi');
-                 console.log(result);
 
                  setTimeout(async () => {
                      result = await contract.hello('World');
