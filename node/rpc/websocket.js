@@ -1,4 +1,5 @@
 const WS = require('ws');
+const TU = require('../common/transactionutils');
 
 class WebSocket {
 
@@ -23,14 +24,13 @@ class WebSocket {
             ws.on('message', async (data) => {
                 const request = JSON.parse(data);
 
-                let handler, client = null;
+                const additionalParams = [];
 
                 if (request.cmd === 'subscribe') {
-                    handler = this.handler.bind(me);
-                    client = ws;
+                    additionalParams.push(this.subscriptionHandler.bind(me), ws);
                 }
 
-                this.middleware[request.cmd].handler(...request.params, handler, client).then(result => {
+                this.middleware[request.cmd].handler(...request.params, ...additionalParams).then(result => {
                     ws.send(JSON.stringify({
                         success : true,
                         id      : request.id,
@@ -51,8 +51,38 @@ class WebSocket {
         });
     }
 
-    handler (message, ws) {
+    subscriptionHandler (message, ws) {
 
+        const response = {
+            success : false
+        };
+
+        try {
+
+            const txResult = message.result.data.value.TxResult;
+            const contractResult = TU.parsePayload(txResult.result.data);
+            const transaction = TU.parsePayload(txResult.tx);
+
+            const data = TU.convertObjectToHex({
+                caller : transaction.account,
+                fn     : transaction.params.fn,
+                params : transaction.params.params,
+                height : txResult.height,
+                result : contractResult,
+                address: transaction.to
+            });
+
+            response.success = true;
+            response.id = transaction.to;
+            response.result = {
+                    data: data
+            };
+
+            ws.send(TU.stringify(response));
+
+        } catch (err) {
+            result.message = err.message || err;
+        }
     }
 }
 

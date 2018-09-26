@@ -127,6 +127,10 @@ class TransActionUtils {
         }
     }
 
+    static stringify (obj) {
+        return stringify(obj);
+    }
+
     static convertObjectToBase64 (obj) {
         return Buffer.from(stringify(obj)).toString('base64');
     }

@@ -25,7 +25,6 @@ class RPCClient {
                 reject(err.message);
             }
         });
-
     }
 
     subscribe (contract, handler, clientSocket) {
@@ -113,17 +112,19 @@ class RPCClient {
             }
 
            delete this.transactions[data.id];
-        }
 
-        const subscription = this.subscriptions[data.id.replace('#event', '')];
+        } else {
 
-        if (subscription) {
-            if (subscription.resolve) {
-                subscription.resolve(data);
-                //todo handle reject
-                delete subscription.resolve;
-            } else {
-                subscription.handler(data, subscription.client);
+            const subscription = this.subscriptions[data.id.replace('#event', '')];
+
+            if (subscription) {
+                if (subscription.resolve) {
+                    subscription.resolve(data);
+                    //todo handle reject
+                    delete subscription.resolve;
+                } else {
+                    subscription.handler(data, subscription.client);
+                }
             }
         }
     }

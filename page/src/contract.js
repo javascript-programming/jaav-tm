@@ -6,6 +6,7 @@ class ClientContract {
         this._client = client;
         delete abi.constructor;
         this._address = address;
+        this._account = account;
 
         const generateFunction = (target, fn, params) => {
             const body = {};

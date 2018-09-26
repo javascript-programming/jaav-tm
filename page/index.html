@@ -27,14 +27,18 @@
              console.log(deploy);
              //todo listen to some event when state is updated, checkTx is executed while deliverTx is updating
              setTimeout(async () => {
-                 let contract = await webclient.getContract(deploy.address, accounts[0], '1234');
-                 let result = await contract.setGreeting('Moi');
 
-                 setTimeout(async () => {
-                     result = await contract.hello('World');
-                     console.log(result);
-                 }, 300);
+                 const helloWorld = await webclient.getContract(deploy.address, accounts[0], '1234');
 
+                 helloWorld.onSetGreeting = (result, options) => {
+                    helloWorld.hello('Terence');
+                 };
+
+                 helloWorld.onHello = (result, options) => {
+                    console.log(result);
+                 };
+
+                 let result = await helloWorld.setGreeting('Moi');
              }, 300);
          });
      });
