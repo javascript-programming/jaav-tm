@@ -73,31 +73,30 @@ class ClientBase {
             ws.onclose = me.onClose.bind(me);
 
             ws.onmessage = (message) => {
+
                 const response = JSON.parse(message.data);
-
-                if (response.result.data) {
-                    response.result.data = JSON.parse(me.fromHex(response.result.data));
-                }
-
                 const request = me.requests[response.id];
 
-                if (request) {
-                    if (response.success) {
+                if (response.success) {
+
+                    if (response.result.data) {
+                        response.result.data = JSON.parse(me.fromHex(response.result.data));
+                    }
+
+                    if (request) {
 
                         request.resolve(response.result);
+                        delete this.requests[response.id];
 
                     } else {
-                        request.reject(response);
+                        const contract = me.contracts[response.id];
+
+                        if (contract) {
+                            me.handleSubscriptionCall(contract, response.result.data);
+                        }
                     }
-
-                    delete this.requests[response.id];
-
                 } else {
-                    const contract = me.contracts[response.id];
-
-                    if (contract) {
-                        me.handleSubscriptionCall(contract, response.result.data);
-                    }
+                    request && request.reject(response);
                 }
             };
         });

@@ -38,7 +38,18 @@
                     console.log(result);
                  };
 
-                 let result = await helloWorld.setGreeting('Moi');
+
+                 helloWorld.onSetObject = async (result, options) => {
+                     console.log(await helloWorld.getObject());
+                 };
+
+                 helloWorld.setGreeting('Moi');
+
+                 helloWorld.setObject({
+                     test : 'test'
+                 });
+
+
              }, 300);
          });
      });
