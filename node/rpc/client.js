@@ -54,11 +54,14 @@ class RPCClient {
                 subscribeFn(this.ws);
 
             } else {
-                this.subscriptions.clients.push(clientSocket);
+                this.subscriptions[contract].clients.push(clientSocket);
+                resolve({
+                    success : true
+                });
             }
 
             clientSocket.on('close', () => {
-                TU.removeItem(this.subscriptions.clients, clientSocket);
+                TU.removeItem(this.subscriptions[contract].clients, clientSocket);
                 //todo and unsubscribe from tendermint
             });
         });
@@ -131,8 +134,7 @@ class RPCClient {
 
                 if (!data.error) {
                     if (subscription.subscriber) {
-                        subscription.subscriber.resolve(data);
-                        //todo handle reject
+                        subscription.subscriber.resolve({ success : true });
                         delete subscription.subscriber;
                     } else {
 
@@ -142,7 +144,7 @@ class RPCClient {
 
                     }
                 } else {
-                    subscription.subscriber && subscription.subscriber.reject(data.error.data);
+                    subscription.subscriber && subscription.subscriber.reject({ success : false, message : data.error.data });
                 }
             }
         }
