@@ -30,25 +30,35 @@ class RPCClient {
     subscribe (contract, handler, clientSocket) {
         return new Promise((resolve, reject) => {
 
-            const id = uuidv1();
+            if (!this.subscriptions[contract]) {
 
-            const subscribeFn = (ws) => {
-                let call = {
-                    "jsonrpc": "2.0",
-                    "method" : "subscribe",
-                    "id"     : id,
-                    "params" : {
-                        "query": "tm.event = 'Tx' AND jv.contract = '" + contract + "'"
-                    }
+                const subscribeFn = (ws) => {
+                    let call = {
+                        "jsonrpc": "2.0",
+                        "method" : "subscribe",
+                        "id"     : contract,
+                        "params" : {
+                            "query": "tm.event = 'Tx' AND jv.contract = '" + contract + "'"
+                        }
+                    };
+                    ws.send(stringify(call));
                 };
-                ws.send(stringify(call));
-            };
 
-            this.subscriptions[id] = { resolve, handler, subscribeFn, client : clientSocket };
-            subscribeFn(this.ws);
+                this.subscriptions[contract] = {
+                    subscriber : { resolve, reject },
+                    handler,
+                    subscribeFn,
+                    clients    : [ clientSocket ]
+                };
+
+                subscribeFn(this.ws);
+
+            } else {
+                this.subscriptions.clients.push(clientSocket);
+            }
 
             clientSocket.on('close', () => {
-                delete this.subscriptions[id];
+                TU.removeItem(this.subscriptions.clients, clientSocket);
                 //todo and unsubscribe from tendermint
             });
         });
@@ -118,12 +128,21 @@ class RPCClient {
             const subscription = this.subscriptions[data.id.replace('#event', '')];
 
             if (subscription) {
-                if (subscription.resolve) {
-                    subscription.resolve(data);
-                    //todo handle reject
-                    delete subscription.resolve;
+
+                if (!data.error) {
+                    if (subscription.subscriber) {
+                        subscription.subscriber.resolve(data);
+                        //todo handle reject
+                        delete subscription.subscriber;
+                    } else {
+
+                        for (let i = 0; i < subscription.clients.length; i++) {
+                            subscription.handler(data, subscription.clients[i]);
+                        }
+
+                    }
                 } else {
-                    subscription.handler(data, subscription.client);
+                    subscription.subscriber && subscription.subscriber.reject(data.error.data);
                 }
             }
         }

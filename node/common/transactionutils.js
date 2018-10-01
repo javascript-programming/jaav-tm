@@ -145,6 +145,11 @@ class TransActionUtils {
         tx.signature = this.signByAccount(stx, privKey);
         return tx;
     }
+
+    static removeItem (arr, value) {
+        const index = arr.indexOf(value);
+        (index !== -1) && arr.splice(index, 1);
+    }
 }
 
 module.exports = TransActionUtils;

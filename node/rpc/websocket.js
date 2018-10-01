@@ -81,7 +81,8 @@ class WebSocket {
             ws.send(TU.stringify(response));
 
         } catch (err) {
-            result.message = err.message || err;
+            response.message = err.message || err;
+            ws.send(TU.stringify(response));
         }
     }
 }
