@@ -8,27 +8,20 @@
 <script type="module">
 
      import('./src/index.js').then( module => {
+
          const webclient = new WebClient('ws://localhost:3000');
          webclient.connect().then(async () => {
-             let accounts = await webclient.getAccounts();
-             console.log(accounts);
-             let balance = await webclient.getBalance(accounts[0]);
-             console.log(balance);
-             let newAccount = await webclient.createAccount('1234');
-             console.log(newAccount);
-             let transfer = await webclient.transfer(accounts[0], accounts[3], 1, 'Test', '1234').catch(err => {
-                 console.log(err) });
-             console.log(transfer);
-             let compile = await webclient.compile();
-             console.log(compile);
-             let contracts = await webclient.getContracts();
-             console.log(contracts);
-             let deploy = await webclient.deploy(accounts[0], '1234', 'HelloWorld');
-             console.log(deploy);
-             //todo listen to some event when state is updated, checkTx is executed while deliverTx is updating
-             setTimeout(async () => {
 
-                 const helloWorld = await webclient.getContract(deploy.address, accounts[0], '1234');
+             let accounts = await webclient.getAccounts();
+             await webclient.compile();
+             let contracts = await webclient.getContracts();
+
+             const address = contracts.filter(item => { return item.name === 'HelloWorld' })[0].address;
+
+             if (!address) {
+                 console.log(await webclient.deploy(accounts[0], '1234', 'HelloWorld'));
+             } else {
+                 const helloWorld = await webclient.getContract(address, accounts[0]);
 
                  helloWorld.onSetGreeting = (result, options) => {
                     helloWorld.hello('Terence');
@@ -38,19 +31,17 @@
                     console.log(result);
                  };
 
-
                  helloWorld.onSetObject = async (result, options) => {
                      console.log(await helloWorld.getObject());
                  };
 
-                 helloWorld.setGreeting('Moi');
+                 helloWorld.setGreeting('Hi');
 
                  helloWorld.setObject({
                      test : 'test'
                  });
+             }
 
-
-             }, 300);
          });
      });
 
