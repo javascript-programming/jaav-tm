@@ -9,7 +9,7 @@
 
      import('./src/index.js').then( module => {
 
-         const webclient = new WebClient('ws://localhost:3000');
+         const webclient = new WebClient('ws://5.157.85.76:3000');
          webclient.connect().then(async () => {
 
              let accounts = await webclient.getAccounts();
