@@ -182,7 +182,7 @@ indexer = "kv"
 # It's recommended to index only a subset of tags due to possible memory
 # bloat. This is, of course, depends on the indexer's DB and the volume of
 # transactions.
-index_tags = ""
+index_tags = "jv.contract"
 
 # When set to true, tells indexer to index all tags. Note this may be not
 # desirable (see the comment above). IndexTags has a precedence over
