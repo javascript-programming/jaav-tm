@@ -110,7 +110,7 @@ class Wallet {
         let tx = TU.createTx(keys.address, keys.privKey, keys.pubKey, 'wallet.create_account', { account : keys.address } );
 
         return new Promise((resolve, reject) => {
-            this.client.send(tx).then(resolve).catch(reject);
+            this.client.send(tx, true).then(resolve).catch(reject);
         });
     }
 

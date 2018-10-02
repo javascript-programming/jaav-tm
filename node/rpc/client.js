@@ -67,14 +67,14 @@ class RPCClient {
         });
     }
 
-    send (tx) {
+    send (tx, commit) {
 
         return new Promise((resolve, reject) => {
 
             const id = uuidv1();
 
             let call = {
-                "method" : "broadcast_tx_sync",
+                "method" : commit ? "broadcast_tx_commit" : "broadcast_tx_sync",
                 "jsonrpc": "2.0",
                 "params" : [TU.convertObjectToBase64(tx)],
                 "id"     : id
@@ -84,6 +84,7 @@ class RPCClient {
             this.ws.send(stringify(call));
         });
     }
+
 
     query (path, data) {
 
@@ -117,6 +118,18 @@ class RPCClient {
         const transaction = this.transactions[data.id];
 
         if (transaction) {
+
+            if (data.result.deliver_tx) {
+                const code = data.result.check_tx.code || 0;
+
+                if (code === 0) {
+                    data.result = data.result.deliver_tx;
+                    data.result.data = TU.convertObjectToHex(TU.parsePayload(data.result.data));
+                } else {
+                    data.result = data.result.check_tx;
+                }
+                data.result.code = code;
+            }
 
             if (data.result && (data.result.code === 0 || (data.result.response && !data.result.response.code))) {
                 transaction.resolve(data);

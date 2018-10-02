@@ -149,7 +149,7 @@ class Contracts {
 
                 me.wallet.unlockAccount(account, password).then(record => {
                     const tx = TU.createTx(account, record.privKey, record.pubKey, 'contract.deploy_contract', payload, entry.keys.address);
-                    me.client.send(tx).then((message) => {
+                    me.client.send(tx, true).then((message) => {
                         entry.deploys = entry.deploys || [];
                         entry.deploys.push(entry.keys.address);
                         entry.address = entry.keys.address;
