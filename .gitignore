@@ -3,3 +3,4 @@
 /node_modules/
 /package-lock.json
 /page/package-lock.json
+/page/node_modules/

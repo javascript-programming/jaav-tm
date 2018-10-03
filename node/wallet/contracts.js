@@ -35,6 +35,12 @@ class Contracts {
             handler : () => { return me.compile(); }
         });
 
+        console.setFunction('upload', {
+            params : ['cls'],
+            handler : (...params) => { return me.upload.apply(me, params); },
+            async : true
+        });
+
         console.setFunction('deploy', {
             params : ['account', 'password', 'contract name'],
             handler : (...params) => { return me.deploy.apply(me, params); },
@@ -89,6 +95,8 @@ class Contracts {
         fs.writeFileSync(this.contractWalletPath, stringify(this.contracts));
     }
 
+
+
     compile () {
         const content = fs.readdirSync(this.contractSourceFolder);
 
@@ -124,6 +132,31 @@ class Contracts {
 
         this.saveContractsStorage();
         return result.join(',');
+    }
+
+    upload (cls) {
+
+        return new Promise( (resolve, reject) => {
+
+            try {
+                const contract = Compiler.compile(CU.getClass(cls));
+
+                if (!this.contracts[contract.name]) {
+                    this.contracts[contract.name] = contract;
+                }
+
+                let entry = this.contracts[contract.name];
+                entry.abi = contract.abi;
+                entry.code = Buffer.from(cls).toString('base64');
+                delete entry.address;
+                resolve(entry);
+
+            } catch (err) {
+                reject(err.message);
+            }
+
+            this.saveContractsStorage();
+        });
     }
 
     deploy (account, password, contract) {

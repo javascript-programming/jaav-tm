@@ -15,14 +15,20 @@ class WebClient extends ClientBase {
         return this.makeRequest('getBalance', account);
     }
 
-    async createAccount (password) {
-        const result = await this.makeRequest('createAccount', password);
-        return result.data;
+    createAccount (password) {
+        const fn = async () => {
+            const result = await this.makeRequest('createAccount', password);
+            return result.data;
+        };
+        return fn();
     }
 
-    async transfer (account, to, amount, message, password) {
-        const result = await this.makeRequest('transfer', account, to, amount, message, password);
-        return result.data;
+    transfer (account, to, amount, message, password) {
+        const fn = async () => {
+            const result = await this.makeRequest('transfer', account, to, amount, message, password);
+            return result.data;
+        };
+        return fn();
     }
 
     changePassword (account, oldPassword, newPassword) {
@@ -37,14 +43,25 @@ class WebClient extends ClientBase {
         return this.makeRequest('compile');
     }
 
-    async deploy (account, password, contract) {
-        const result = await this.makeRequest('deploy', account, password, contract);
-        return result.data;
+    upload (cls) {
+        return this.makeRequest('upload', cls.toString());
     }
 
-    async getContract (address, account) {
-        const abi = await this.makeRequest('abi', address);
-        return await this.registerContract(new ClientContract(this, address, abi, account));
+    deploy (account, password, contract) {
+        const fn = async () => {
+            const result = await this.makeRequest('deploy', account, password, contract);
+            return result.data;
+        };
+        return fn();
+    }
+
+    getContract (address, account) {
+        const fn = async () => {
+            const abi = await this.makeRequest('abi', address);
+            return await this.registerContract(new ClientContract(this, address, abi, account));
+        };
+
+        return fn();
     }
 }
 
