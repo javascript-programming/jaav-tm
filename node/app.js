@@ -3,6 +3,27 @@ const Commands = require('./commands');
 const commands = new Commands();
 const options = commands.getOptions().options;
 
+if (options.node) {
+    const AbciServer = require('./abci/server');
+    const TendermintNode = require('./node/server');
+
+    const abciServer = new AbciServer();
+
+    const WalletHandler = require('./handlers/wallet');
+    abciServer.use(WalletHandler);
+
+    const ContractHandler = require('./handlers/contract');
+    abciServer.use(ContractHandler);
+
+    const tendermintNode = new TendermintNode(options.home, options.node, options.tendermint, options.abci);
+
+    abciServer.start(options.abci);
+    console.log('abci started')
+    tendermintNode.start();
+    console.log('tendermint started')
+}
+
+
 if (options.rpc) {
 
     const RPCServer = require('./rpc/server');
@@ -24,22 +45,4 @@ if (options.rpc) {
 
         rpcServer.startServer(console.getFunctions());
     });
-
-} else {
-
-    const AbciServer = require('./abci/server');
-    const TendermintNode = require('./node/server');
-
-    const abciServer = new AbciServer();
-
-    const WalletHandler = require('./handlers/wallet');
-    abciServer.use(WalletHandler);
-
-    const ContractHandler = require('./handlers/contract');
-    abciServer.use(ContractHandler);
-
-    const tendermintNode = new TendermintNode(options.home, options.node, options.tendermint, options.abci);
-
-    abciServer.start(options.abci);
-    tendermintNode.start();
 }

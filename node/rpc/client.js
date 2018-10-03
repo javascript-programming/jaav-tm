@@ -166,7 +166,7 @@ class RPCClient {
     onClose () {
         this.ready = false;
         console.log('Websocket connection to tendermint rpc closed');
-        this.connect();
+        this.connect().catch(err => console.log(err.message));
     }
 
     setReady (cb) {
