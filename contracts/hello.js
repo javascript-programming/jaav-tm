@@ -10,14 +10,6 @@ class HelloWorld {
         return this.state.greeting + ' ' + world;
     }
 
-    setObject (obj) {
-        this.state.obj = obj;
-    }
-
-    getObject () {
-        return this.state.obj;
-    }
-
     setGreeting (greeting) {
         this.state.greeting = greeting;
     }

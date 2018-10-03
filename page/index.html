@@ -27,24 +27,11 @@
 
              const helloWorld = await webclient.getContract(address, accounts[0]);
 
-             helloWorld.onSetGreeting = (result, options) => {
-                helloWorld.hello('5.157.85.181');
-             };
-
              helloWorld.onHello = (result, options) => {
-                console.log(result);
+                 console.log(result);
              };
 
-             helloWorld.onSetObject = async (result, options) => {
-                 console.log(await helloWorld.getObject());
-             };
-
-             helloWorld.setGreeting('Hello');
-
-             helloWorld.setObject({
-                 test : 'test'
-             });
-
+             helloWorld.hello(window.location.hostname);
          });
      });
 
