@@ -1,0 +1,16 @@
+[Unit]
+Description=Jaav TM JavaScript BlockChain
+[Service]
+User=jaavnl
+# The configuration file application.properties should be here:
+#change this to your workspace
+WorkingDirectory=/home/jaavnl/tendermint
+#path to executable.
+#executable is a bash script which calls jar
+fileExecStart=/home/jaavnl/tendermint/run_node.sh
+SuccessExitStatus=143
+TimeoutStopSec=10
+Restart=on-failure
+RestartSec=5
+[Install]
+WantedBy=multi-user.target
