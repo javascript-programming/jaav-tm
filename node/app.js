@@ -18,9 +18,7 @@ if (options.node) {
     const tendermintNode = new TendermintNode(options.home, options.node, options.tendermint, options.abci);
 
     abciServer.start(options.abci);
-    console.log('abci started')
     tendermintNode.start();
-    console.log('tendermint started')
 }
 
 
@@ -31,18 +29,23 @@ if (options.rpc) {
 
     const client = rpcServer.getClient();
 
-    client.connect().then(() => {
-        const Console = require('./console');
-        const Wallet = require('./wallet/wallet');
+    setTimeout(() => {
+        try {
+            client.connect().then(() => {
+                const Console = require('./console');
+                const Wallet = require('./wallet/wallet');
 
-        const wallet = new Wallet(client, options.home);
-        const console = new Console();
-        wallet.console = console;
+                const wallet = new Wallet(client, options.home);
+                const console = new Console();
+                wallet.console = console;
 
-        const Contracts = require('./wallet/contracts');
-        const contracts = new Contracts(wallet);
-        contracts.console = console;
+                const Contracts = require('./wallet/contracts');
+                const contracts = new Contracts(wallet);
+                contracts.console = console;
 
-        rpcServer.startServer(console.getFunctions());
-    });
+                rpcServer.startServer(console.getFunctions());
+            }).catch(err => console.log(err));
+        }
+        catch (err) {  }
+    }, 4000)
 }
