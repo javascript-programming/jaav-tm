@@ -33,7 +33,8 @@ class TendermintNode {
             }
         });
 
-        node.stdout.pipe(process.stdout)
+        node.stdout.pipe(process.stdout);
+        return node.started();
     }
 }
 
