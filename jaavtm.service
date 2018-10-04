@@ -6,8 +6,8 @@ User=jaavnl
 #change this to your workspace
 WorkingDirectory=/home/jaavnl/tendermint
 #path to executable.
-#executable is a bash script which calls jar
-fileExecStart=/home/jaavnl/tendermint/run_node.sh
+#executable is a bash script which calls node file
+ExecStart=/home/jaavnl/tendermint/run_node.sh
 SuccessExitStatus=143
 TimeoutStopSec=10
 Restart=on-failure
