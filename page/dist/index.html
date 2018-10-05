@@ -7,7 +7,7 @@
 </head>
 <body>
 <script>
-    const webclient = new WebClient('ws://localhost:3000');
+    const webclient = new WebClient('ws://' + window.location.host);
     webclient.connect().then(async () => {
         let accounts = await webclient.getAccounts();
         console.log(accounts);
