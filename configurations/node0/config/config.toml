@@ -102,13 +102,13 @@ addr_book_file = "config/addrbook.json"
 addr_book_strict = false
 
 # Time to wait before flushing messages out on the connection, in ms
-flush_throttle_timeout = 100
+flush_throttle_timeout = 1000
 
 # Maximum number of peers to connect to
 max_num_peers = 50
 
 # Maximum size of a message packet payload, in bytes
-max_packet_msg_payload_size = 10240
+max_packet_msg_payload_size = 102400
 
 # Rate at which packets can be sent, in bytes/second
 send_rate = 5120000
@@ -140,7 +140,7 @@ wal_dir = "data/mempool.wal"
 size = 100000
 
 # size of the cache (used to filter transactions we saw earlier)
-cache_size = 100000
+cache_size = 1000000
 
 ##### consensus configuration options #####
 [consensus]
@@ -153,7 +153,7 @@ timeout_propose_delta = 500
 timeout_prevote = 1000
 timeout_prevote_delta = 500
 timeout_precommit = 1000
-timeout_precommit_delta = 500
+timeout_precommit_delta = 5000
 timeout_commit = 1000
 
 # Make progress as soon as we have all the precommits (as if TimeoutCommit = 0)
