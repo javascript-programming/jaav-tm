@@ -108,7 +108,7 @@ flush_throttle_timeout = 100
 max_num_peers = 50
 
 # Maximum size of a message packet payload, in bytes
-max_packet_msg_payload_size = 10240
+max_packet_msg_payload_size = 1024000
 
 # Rate at which packets can be sent, in bytes/second
 send_rate = 5120000
@@ -137,10 +137,10 @@ broadcast = true
 wal_dir = "data/mempool.wal"
 
 # size of the mempool
-size = 100000
+size = 10000000
 
 # size of the cache (used to filter transactions we saw earlier)
-cache_size = 100000
+cache_size = 10000000
 
 ##### consensus configuration options #####
 [consensus]
