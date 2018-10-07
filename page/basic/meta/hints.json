@@ -1,0 +1,11 @@
+{
+    "[data-index='1'] .b-grid-cell": {
+        "title": "Resources",
+        "content": "Displayed in columns to the left",
+        "align": "l0-r0"
+    },
+    ".b-sch-event": {
+        "title": "Events",
+        "content": "As bars to the right. Draggable and resizable using the mouse"
+    }
+}
