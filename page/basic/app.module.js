@@ -1,5 +1,5 @@
 import { WidgetHelper,Toast,Popup,Scheduler,EventModel} from 'https://www.bryntum.com/examples/build/scheduler.module.js?1538392410036';
-import shared from 'https://www.bryntum.com/examples/scheduler/_shared/shared.module.js?1538392410036';
+import shared from './shared.module/shared.module.js?1538392410036';
 import BasicData from './contract/data.js';
 /* eslint-disable no-unused-vars */
 
