@@ -1,4 +1,4 @@
-import { Scheduler,WidgetHelper,AjaxHelper,DomHelper,Popup,Tooltip,Toast,BrowserHelper,StringHelper,LocaleManager,Localizable,DataGenerator,Fullscreen,Events,GlobalEvents,VersionHelper } from '../../build/scheduler.module.js?1538907909576';
+import { Scheduler,WidgetHelper,AjaxHelper,DomHelper,Popup,Tooltip,Toast,BrowserHelper,StringHelper,LocaleManager,Localizable,DataGenerator,Fullscreen,Events,GlobalEvents,VersionHelper } from 'https://www.bryntum.com/examples/build/scheduler.module.js?1538392410036';
 
 if (document.location.protocol === 'file:') {
     alert('ERROR: You must run examples on a webserver (not using the file: protocol)');
