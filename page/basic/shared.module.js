@@ -459,7 +459,7 @@ class Shared extends Localizable(Events()) {
             document.body.classList.add('b-notransition');
         }
 
-        document.head.insertBefore(link, document.head.firstElementChild);
+       // document.head.insertBefore(link, document.head.firstElementChild);
     }
 
     //endregion
