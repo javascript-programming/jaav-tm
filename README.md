@@ -23,7 +23,7 @@ Open Chrome console on http://localhost:3000/page. If all is runing correctly yo
 
 ##### Wallet functions
 
- To get your accounts (Two accounts are provided with each 1000 coins on balance)
+ To get your accounts (two accounts are provided with each 1000 coins on balance)
 
         > let accounts = await webclient.getAccounts()
 
@@ -95,7 +95,7 @@ A call made from node 5.157.85.181 will result e.g. on 5.157.85.76 to:
 ### RPC
 
 The section above is about calling the chain with the webclient, which is using websockets. For older browsers the functions above
- are also available by rpc get and post ajax calls. Please see `node\rpc\http.js` for the correspon ding end points
+ are also available by rpc get and post ajax calls. Please see `node\rpc\http.js` for the corresponding endpoints
 
 
 
