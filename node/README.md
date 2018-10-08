@@ -1,6 +1,6 @@
 ### Architecture of the Jaav TM Node
 
-The setup is according the this scheme.
+The setup is according to the following scheme.
 
 ![Alt text](https://github.com/wolfposd/tutorials/raw/master/images/tendermint/TMApplicationExample.png?raw=true "Scheme")
 https://github.com/wolfposd/tutorials/raw/master/images/tendermint/TMApplicationExample.png
@@ -13,8 +13,9 @@ Source: https://tendermint.com/docs/app-dev/app-development.html#abci-design
  - The tendermint node is a binary shipped as npm package. It is called in `node\server.js`. This server is the client of the abci server.
  The tendermint node accepts broadcast messages on port 46657 from the Client-interface.
  The tendermint node is connected to other tendermint nodes on port 46656. The tendermint node is responsible for the consensus algorithm and transportation of blocks between the nodes.
- - The Client-interface is implemented in the `rpc` folder. It listens on port 3000 for incoming requests made from clients like browser applications.
-  The RPC accepts three kinds of clients: a console, the rpc http endpoints and websockets.
+ - The Client-interface/JSON-RPC is implemented in the `rpc` folder. JSON-RPC is implemented in `client.js`. In this case the RPC and Client are merged together where the `http.js` and 'websocket.js' is the the Client-interface.
+  It listens on port 3000 for incoming requests made from clients like browser applications. Unlike in the picture (connection Client-interface / Node app) there is no connection with the abci (Node app).
+  The RPC accepts three kinds of clients: a console, clients who make requests through the http- and websocket endpoints.
 
 The `wallet` folder contains the implementation of the account and contract wallet.  The handlers in the `handler` folder are used by the abci to process incoming blocks.
 
