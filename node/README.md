@@ -21,6 +21,19 @@ The `wallet` folder contains the implementation of the account and contract wall
 
 The `common` folder contains utils used by all other packages. Like crypto and encoding stuff.
 
+### Start up commands
+
+Defined in `commands.js`
+
+
+            this.getopt = new Getopt([
+                ['t',       'tendermint=PORT'         , 'Tendermint port (default 46657)'],
+                ['d',       'home=PATH'               , 'HOME data path'],
+                ['a',       'abci=PORT'               , 'ABCI port (default 46658)'     ],
+                ['n',       'node=PATH'               , 'Node name in configurations folder'],
+                ['r',       'rpc=PORT'                , 'Start rpc client and console (default 3000)'   ]
+            ]);
+
 ### Further reading
 
 - https://tendermint.com/docs/app-dev/app-development.html#abci-design
