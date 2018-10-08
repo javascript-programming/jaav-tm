@@ -13,7 +13,7 @@ Source: https://tendermint.com/docs/app-dev/app-development.html#abci-design
  - The tendermint node is a binary shipped as npm package. It is called in `node\server.js`. This server is the client of the abci server.
  The tendermint node accepts broadcast messages on port 46657 from the Client-interface.
  The tendermint node is connected to other tendermint nodes on port 46656. The tendermint node is responsible for the consensus algorithm and transportation of blocks between the nodes.
- - The Client-interface/JSON-RPC is implemented in the `rpc` folder. JSON-RPC is implemented in `client.js`. In this case the RPC and Client are merged together where the `http.js` and 'websocket.js' is the the Client-interface.
+ - The Client-interface/JSON-RPC is implemented in the `rpc` folder. JSON-RPC is implemented in `client.js`. In this case the RPC and Client are merged together where `http.js` and `websocket.js` are the implementations of the Client-interface.
   It listens on port 3000 for incoming requests made from clients like browser applications. Unlike in the picture (connection Client-interface / Node app) there is no connection with the abci (Node app).
   The RPC accepts three kinds of clients: a console, clients who make requests through the http- and websocket endpoints.
 
