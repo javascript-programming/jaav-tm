@@ -114,16 +114,18 @@ The section above is about calling the chain with the webclient, which is using 
 - Define call and get functions on contracts. Apply some metadata which function changes state. Maybe compiler can detect this.
 - Refactor promise/async functions.
 - Make option to keep account private keys off node
-- Investigate better encryption for private key files
-- abci core package contains bug, socket connections stream over multiple requests. Patched in `node\abci\patch`. Needs to be re-applied after `npi i`
-- Refactor console or remove it completely, it is now the glue bringing all the functions together.
-- Investigate to put all in docker containers. First attempt failed, docker doesn't seems to have `localhost`. Need to use docker compose and define a network.
+- Investigate better encryption for account private key files
+- abci core package contains a bug, socket connections can stream over multiple requests when package size is larger than 4094 bytes. Patched in `node\abci\patch`. Needs to be re-applied after `npi i`
+- Refactor the console or -better- remove it completely. It is now the glue bringing all the functions and pieces together.
+- Investigate to put all in docker containers. First attempt failed, docker doesn't seems to recognize its own `localhost` causing the betwork to fail. Need to use docker compose and define a network.
 - Docker should use alpine as base
-- Invetigate businesscard concept. Make accounts identifiable.
+- Investigate Hyperledger businesscard concept. Make accounts identifiable. Store and exchange off chain data.
 - Create a lot of examples
 - Implement a network generator, making genesis and key files and configuring the toml files automatically
 - Query the state on height. Now only the current state is returned, should be able to iterate its history
 - Create stats dashboard on node
+- Support https
+- Write tests to ensure core functionality
 
 
 
