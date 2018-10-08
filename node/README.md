@@ -34,6 +34,8 @@ Defined in `commands.js`
                 ['r',       'rpc=PORT'                , 'Start rpc client and console (default 3000)'   ]
             ]);
 
+Main entry point is `app.js`
+
 ### Further reading
 
 - https://tendermint.com/docs/app-dev/app-development.html#abci-design
