@@ -9,7 +9,7 @@ The configuration is done in the `config/config.toml` file.
 
 To understand the setup of a tendermint network it is recommended to read the quick start: https://tendermint.com/docs/introduction/quick-start.html#overview
 
-When you create a new toml file using the tendermint generator, the framework requires the follwing modifications
+In case you create a new toml file by using the tendermint generator utilities, remind that the jaav-tm framework requires the following modifications
 
 - Increase the package payload according to your needs
 
