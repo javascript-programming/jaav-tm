@@ -121,6 +121,9 @@ The section above is about calling the chain with the webclient, which is using 
 - Docker should use alpine as base
 - Invetigate businesscard concept. Make accounts identifiable.
 - Create a lot of examples
+- Implement a network generator, making genesis and key files and configuring the toml files automatically
+- Query the state on height. Now only the current state is returned, should be able to iterate its history
+- Create stats dashboard on node
 
 
 
