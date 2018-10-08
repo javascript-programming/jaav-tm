@@ -8,7 +8,7 @@ https://github.com/wolfposd/tutorials/raw/master/images/tendermint/TMApplication
 Source: https://tendermint.com/docs/app-dev/app-development.html#abci-design
 
  - On startup the abci server (port 46658) is started (NodeApp in the picture). The abci is receiving requests from the tendermint client. The abci is validating sent blocks and updates the application state.
- Its implementation is found in the folder `abci`. The abci keeps the application state which is implemented in statemanager.js (Database in the picture).
+ Its implementation is found in the folder `abci`. The abci keeps the application state which is implemented in `statemanager.js` (Database in the picture).
  In this case there is no connection between the Statemanager and the Client-interface. The abci and statemanager are isolated, it is only receiving requests from the tendermint client.
  - The tendermint node is a binary shipped as npm package. It is called in `node\server.js`. This server is the client of the abci server.
  The tendermint node accepts broadcast messages on port 46657 from the Client-interface.
