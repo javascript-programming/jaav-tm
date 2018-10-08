@@ -15,7 +15,7 @@ Install node packages and set execute permission
 
 ### Run
 
-Set configuration (folder name in configurations) + rpc port. Note: node0 and node1 are used for a chain with two validators
+Set configuration (folder name in `configurations` folder) + rpc port. Note: `node0` and `node1` are used for a chain with two validators
 
     ./run_node.sh single 3000
 
