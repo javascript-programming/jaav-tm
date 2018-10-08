@@ -60,4 +60,4 @@ When starting the `app.js` server, you can set another location with the `-d` fl
 
 When the node is started it will remove the existing `network` folder, this will delete your chain data. This will also happen in a multi node environment,
 only when a single node is restarted and the datafiles are cleared, the node will restore it self with blocked sent from other live nodes in the network.
-The erase the complete chain you have to stop all nodes and restart all nodes on-by-one again.
+The erase the complete chain you have to stop all nodes and restart all nodes one-by-one again.
