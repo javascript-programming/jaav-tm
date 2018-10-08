@@ -25,7 +25,7 @@ Open the Chrome console on http://localhost:3000/page. If all is running correct
 
 ##### Wallet functions
 
- To get your accounts (at startup two accounts are provided with each 1000 coins as balance)
+ To get your accounts (at startup two accounts are provided with each 1000 coins on balance)
 
         > let accounts = await webclient.getAccounts()
 
@@ -37,7 +37,7 @@ Open the Chrome console on http://localhost:3000/page. If all is running correct
 
         > await webclient.transfer(accounts[0], accounts[1], 1, 'Message for cashbook', '1234');
 
- To create a new accounts use `createAccount (password)`
+ To create a new account use `createAccount (password)`
 
         > await webclient.createAccount('1234')
 
