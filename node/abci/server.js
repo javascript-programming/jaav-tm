@@ -67,7 +67,6 @@ class ABCIServer {
 
     getBeginBlockHandler () {
         const beginBlock = (request) => {
-            console.log('block')
             return {
                 tags : []
             }

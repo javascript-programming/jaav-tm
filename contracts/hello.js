@@ -13,5 +13,4 @@ class HelloWorld {
     setGreeting (greeting) {
         this.state.greeting = greeting;
     }
-
 }
