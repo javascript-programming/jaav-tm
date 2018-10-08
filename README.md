@@ -99,7 +99,28 @@ For example, a call made from node `5.157.85.181` will result on `5.157.85.76` i
 The section above is about calling the chain with the webclient, which is using websockets. For older browsers the functions above
  are also available by rpc get and post ajax calls. Please see `node\rpc\http.js` for the corresponding endpoints
 
+### TODO
 
+- Equip the statemanager with a mongodb, mongodb should be able to return state hash and should have a readonly user.
+- Set application hash (calculated on code base) in the genesis file for extra security
+- Write tests for contracts to ensure determinism
+- Provide extra functionality to contracts to send and receive coins
+- Define initial amount of coins, make it configurable
+- Implement inheritance for contracts
+- Implement the library concept
+- Implement destroy method on contract which will return funds to owner
+- Investigate modifier rules on contract functions
+- Define private methods on contracts
+- Define call and get functions on contracts. Apply some metadata which function changes state. Maybe compiler can detect this.
+- Refactor promise/async functions.
+- Make option to keep account private keys off node
+- Investigate better encryption for private key files
+- abci core package contains bug, socket connections stream over multiple requests. Patched in `node\abci\patch`. Needs to be re-applied after `npi i`
+- Refactor console or remove it completely, it is now the glue bringing all the functions together.
+- Investigate to put all in docker containers. First attempt failed, docker doesn't seems to have `localhost`. Need to use docker compose and define a network.
+- Docker should use alpine as base
+- Invetigate businesscard concept. Make accounts identifiable.
+- Create a lot of examples
 
 
 
