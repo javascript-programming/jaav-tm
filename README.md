@@ -78,7 +78,7 @@ Open the Chrome console on http://localhost:3000/page. If all is running correct
 
 - To call a contract function
 
-        > let result = await webclient.hello('world')
+        > let result = await helloWorld.hello('world')
 
 ![Alt text](images/deploy_helloworld.png?raw=true "Deploy contract")
 
