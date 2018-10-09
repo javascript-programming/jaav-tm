@@ -9,7 +9,7 @@ To build
 
 The `basic` folder contains a Bryntum scheduler powered by the Jaav-tm framework.
 
- The demo is available on http://5.157.85.76:3000/page/basic and http://5.157.85.181:3000/page
+ The demo is available on http://5.157.85.76:3000/page/basic and http://5.157.85.181:3000/page/basic
 
 To use the plugin in your web app, just add the `main.js` to your page
 
