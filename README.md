@@ -82,7 +82,7 @@ Open the Chrome console on http://localhost:3000/page. If all is running correct
 
 ![Alt text](images/deploy_helloworld.png?raw=true "Deploy contract")
 
- For each function in the contract there is `onFunctionName` listener available which is triggered when the function is called.
+ For each function in the contract there is a `onFunctionName` listener available which is triggered when the function is called.
 
         > helloWorld.onHello = (result, options) => { console.log(result) }
 
