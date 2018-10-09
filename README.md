@@ -99,6 +99,8 @@ For example, a call made from node `5.157.85.181` will result on `5.157.85.76` i
 The section above is about calling the chain with the webclient, which is using websockets. For older browsers the functions above
  are also available by rpc get and post ajax calls. Please see `node\rpc\http.js` for the corresponding endpoints
 
+See the `page` folder for the client and basic demo.
+
 ### TODO
 
 - Equip the statemanager with a mongodb, mongodb should be able to return state hash and should have a readonly user.
