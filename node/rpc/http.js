@@ -24,6 +24,7 @@ class HttpServer {
         app.get('/contracts/:address/state', this.getContractState.bind(this));
 
         app.use('/page', serveStatic(path.join(__dirname, '../../page')));
+        app.use('/examples', serveStatic(path.join(__dirname, '../../examples')));
 
         this.http = http.createServer(app);
     }

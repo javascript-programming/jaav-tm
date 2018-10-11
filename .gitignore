@@ -5,3 +5,4 @@
 /page/package-lock.json
 /page/node_modules/
 !/node_modules/abci/
+/examples/
