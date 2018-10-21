@@ -174,21 +174,38 @@ class Contracts {
 
                 entry.keys = TU.createNewKeyAndAddress();
 
-                const payload = {
-                    name    : entry.name,
-                    abi     : entry.abi,
-                    code    : entry.code
+                const codeChunks = entry.code.match(/[\s\S]{1,1000}/g), payloads = [];
+
+                codeChunks.forEach((chunk, index) => {
+                    payloads.push({
+                        name    : entry.name,
+                        abi     : index === 0 ? entry.abi : undefined,
+                        code    : chunk,
+                        total   : codeChunks.length,
+                        index   : index + 1
+                    });
+                }, this);
+
+                const sendFragments = (account, accountRecord) => {
+
+                    const payload = payloads.shift();
+
+                    const tx = TU.createTx(account, accountRecord.privKey, accountRecord.pubKey, 'contract.deploy_contract', payload, entry.keys.address);
+                    me.client.send(tx, true).then((message) => {
+                        if (payloads.length) {
+                            sendFragments(account, accountRecord);
+                        } else {
+                            entry.deploys = entry.deploys || [];
+                            entry.deploys.push(entry.keys.address);
+                            entry.address = entry.keys.address;
+                            me.saveContractsStorage();
+                            resolve(message);
+                        }
+                    }).catch(reject);
                 };
 
                 me.wallet.unlockAccount(account, password).then(record => {
-                    const tx = TU.createTx(account, record.privKey, record.pubKey, 'contract.deploy_contract', payload, entry.keys.address);
-                    me.client.send(tx, true).then((message) => {
-                        entry.deploys = entry.deploys || [];
-                        entry.deploys.push(entry.keys.address);
-                        entry.address = entry.keys.address;
-                        me.saveContractsStorage();
-                        resolve(message);
-                    }).catch(reject);
+                   sendFragments(account, record)
                 }).catch(reject);
 
             } else {

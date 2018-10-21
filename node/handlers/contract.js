@@ -37,48 +37,41 @@ class ContractHandler {
         if (!state.accounts[tx.account])
             throw new Error('Contract can only be deployed from valid account');
 
-        if (state.contracts[tx.to])
-            throw new Error('This contract address already exists');
+        if (state.contracts[tx.to] && state.contracts[tx.to].deployed)
+            throw new Error('This contract address is already deployed');
 
-        let value = 0;
-        if (Number.isInteger(tx.value) && tx.value > 0) {
-            value = tx.value;
-        }
+        const params = tx.params;
 
-        if (state.accounts[tx.account].balance >= value) {
-            state.accounts[tx.account].balance -= value;
-
-            let message = 'Initial funds from ' + tx.account;
-
-            const Cls = CU.getClass(Buffer.from(tx.params.code, 'base64').toString());
-            const instance = new Cls();
-            const initialState = instance.state || {};
-
+        if (params.index === 1) {
             state.contracts[tx.to] = {
-                balance     : value,
+                balance     : 0,
+                owner       : tx.account,
                 address     : tx.to,
-                cashbook    : value > 0 ? [{ from: tx.account, amount: value, message }] :[],
+                cashbook    : [],
                 name        : tx.params.name,
                 abi         : tx.params.abi,
-                code        : tx.params.code,
-                state       : initialState
+                code        : '',
+                deployed    : false
             };
+        }
 
-            if (value > 0) {
-                message = 'Transfer to contract ' + tx.to;
-                state.accounts[tx.account].cashbook.push({to: tx.to, amount: value, message});
-            }
+        const contract = state.contracts[tx.to];
+        contract.code += params.code;
 
-        } else {
-            throw new Error('Insufficient funds you have!');
+        if (params.index === params.total) {
+            const Cls = CU.getClass(Buffer.from(contract.code, 'base64').toString());
+            const instance = new Cls();
+            contract.state = instance.state || {};
+            contract.deployed = true;
         }
 
         return {
-            log     : 'Contract deployed',
+            log     : 'Contract deployment',
             result  : {
-                address: tx.to,
-                abi    : tx.params.abi,
-                owner  : tx.account
+                address     : contract.address,
+                abi         : contract.abi,
+                owner       : contract.owner,
+                deployed    : contract.deployed
             }
         };
     }
