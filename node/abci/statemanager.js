@@ -59,7 +59,7 @@ class StateManager {
                 result.value = data;
             }
 
-            result.value = Buffer.from(stringify(result.value));
+            result.value = Buffer.from(stringify(result.value || {}));
 
             result.proof = TU.sha256(result.value);
             result.code = 0;
