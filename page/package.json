@@ -8,7 +8,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack"
   },
-  "keywords": ["Jaav-tm websocket web client"],
+  "keywords": [
+    "Jaav-tm websocket web client"
+  ],
   "author": "Jaav",
   "license": "ISC",
   "devDependencies": {

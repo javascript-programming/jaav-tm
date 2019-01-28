@@ -24,6 +24,7 @@ class Wallet {
 
             this.wallet = {
                 accounts : {},
+                names : {},
                 account  : keys.address
             };
 
@@ -53,6 +54,18 @@ class Wallet {
 
         console.setFunction('createAccount', {
             params : ['password'],
+            handler : (...params) => { return me.createAccount.apply(me, params); },
+            async   : true
+        });
+
+        console.setFunction('getAccount', {
+            params : ['name', 'password'],
+            handler : (...params) => { return me.getAccount.apply(me, params); },
+            async   : true
+        });
+
+        console.setFunction('createNamedAccount', {
+            params : ['password', 'name'],
             handler : (...params) => { return me.createAccount.apply(me, params); },
             async   : true
         });
@@ -87,29 +100,38 @@ class Wallet {
     }
 
 
-    createAccount (password) {
-        return this.addAccount(TU.createNewKeyAndAddress(), password);
+    createAccount (password, name) {
+        return this.addAccount(TU.createNewKeyAndAddress(), password, name);
     }
 
-    addAccount (keys, password) {
-
-        password = password || '1234';
-        console.log('Account password');
-
-        const cryptr = new Cryptr(password.toString());
-
-        this.wallet.accounts[keys.address] = {
-            privKey : cryptr.encrypt(keys.privKey),
-            pubKey  : keys.pubKey
-        };
-
-        this.saveWallet();
-        console.log("New account written to wallet file");
-        console.log(keys);
-
-        let tx = TU.createTx(keys.address, keys.privKey, keys.pubKey, 'wallet.create_account', { account : keys.address } );
+    addAccount (keys, password, name) {
 
         return new Promise((resolve, reject) => {
+
+            if (name) {
+                if (this.wallet.names[name])
+                    reject('Name already exists');
+                else
+                    this.wallet.names[name] = keys.address;
+            }
+
+            password = password || '1234';
+            console.log('Account password');
+
+            const cryptr = new Cryptr(password.toString());
+
+            this.wallet.accounts[keys.address] = {
+                privKey : cryptr.encrypt(keys.privKey),
+                pubKey  : keys.pubKey
+            };
+
+            this.saveWallet();
+            console.log("New account written to wallet file");
+            console.log(keys);
+
+            let tx = TU.createTx(keys.address, keys.privKey, keys.pubKey, 'wallet.create_account', { account : keys.address } );
+
+
             this.client.send(tx, true).then(resolve).catch(reject);
         });
     }
@@ -159,8 +181,7 @@ class Wallet {
                     return;
                 }
 
-                resolve(record);
-
+                resolve({ privKey : record.privKey, pubKey : record.pubKey, account : account });
             } else {
                 reject('Account not found in this wallet');
             }
@@ -172,6 +193,7 @@ class Wallet {
 
         if (this.unlocked[account]) {
             clearTimeout(this.unlocked[account].timeout);
+            delete this.unlocked[account].timeout;
             delete this.unlocked[account];
         }
     }
@@ -190,6 +212,10 @@ class Wallet {
 
     get account () {
         return this.wallet.accounts[this.wallet.account];
+    }
+
+    async getAccount (name, password) {
+        return this.unlockAccount(this.wallet.names[name], password);
     }
 
     setMainAccount (account) {
