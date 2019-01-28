@@ -23,6 +23,22 @@ class WebClient extends ClientBase {
         return fn();
     }
 
+    createNamedAccount (password, name) {
+        const fn = async () => {
+            const result = await this.makeRequest('createAccount', password, name);
+            return result.data;
+        };
+        return fn();
+    }
+
+    getAccount (name, password) {
+        return this.makeRequest('getAccount', name, password);
+    }
+
+    unlockAccount (account, password) {
+        return this.makeRequest('unlockAccount', account, password);
+    }
+
     transfer (account, to, amount, message, password) {
         const fn = async () => {
             const result = await this.makeRequest('transfer', account, to, amount, message, password);
