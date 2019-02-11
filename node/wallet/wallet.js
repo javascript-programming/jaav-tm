@@ -153,14 +153,15 @@ class Wallet {
         });
     }
 
-    unlockAccount(account, password) {
+    unlockAccount(account, password, strict) {
 
         return new Promise((resolve, reject) => {
 
             password = password || '1234';
             password = password.toString();
 
-            account = account || this.wallet.account;
+            if (!strict)
+                account = account || this.wallet.account;
 
             if (!this.isLocked(account)) {
                 this.lockAccount(account);
@@ -215,7 +216,7 @@ class Wallet {
     }
 
     async getAccount (name, password) {
-        return this.unlockAccount(this.wallet.names[name], password);
+        return this.unlockAccount(this.wallet.names[name], password, true);
     }
 
     setMainAccount (account) {
