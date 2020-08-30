@@ -5,13 +5,9 @@ const StateManager = require('./statemanager');
 
 class ABCIServer {
 
-    constructor () {
+    constructor (mongo) {
 
-        this.stateManager = new StateManager({
-            accounts    : {},
-            contracts   : {}
-        });
-
+        this.stateManager = new StateManager(mongo);
 
         this.stateManager.chainInfo = {
             height : 0
@@ -107,7 +103,7 @@ class ABCIServer {
 
     getDeliveryTxHandler () {
 
-        const deliverTx = (request, clone) => {
+        const deliverTx = (request, check) => {
 
             try {
                 const transaction = this.getTransaction(request);
@@ -115,13 +111,18 @@ class ABCIServer {
                 if (!TU.verifyTx(transaction))
                     throw new Error('Signature not valid');
 
-                const state = !clone ? this.stateManager.state : TU.clone(this.stateManager.state);
-                const handler = this.getHandler(transaction);
-                const receipt = handler(state, transaction, this.stateManager.chainInfo);
+                let receipt = {};
                 let tags = [];
 
-                if (!clone && receipt.tags) {
-                    tags = receipt.tags;
+                if (!check) {
+                    this.stateManager.beginTransaction();
+                    const state = this.stateManager.state;
+                    const handler = this.getHandler(transaction);
+                    handler(state, transaction, this.stateManager.chainInfo);
+                    this.stateManager.endTransaction();
+                    if (receipt.tags) {
+                        tags = receipt.tags;
+                    }
                 }
 
                 return {
@@ -133,6 +134,7 @@ class ABCIServer {
 
 
             } catch (err) {
+                this.stateManager.abortTransaction();
                 return { code: 1, log: err.message }
             }
         };

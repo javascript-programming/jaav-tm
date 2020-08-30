@@ -34,6 +34,8 @@ class ContractHandler {
 
     static deploy_contract (state, tx) {
 
+        const account = state.getAccount(tx.account)
+
         if (!state.accounts[tx.account])
             throw new Error('Contract can only be deployed from valid account');
 
@@ -104,8 +106,7 @@ class ContractHandler {
             if (!state.accounts[account])
                 throw new Error('Caller account unknown');
 
-            const immutableState = TU.clone(contract.state);
-            return executeContract(contract, immutableState, fn, params, account).result;
+            return executeContract(contract, contract.state, fn, params, account).result;
 
         } else {
             throw new Error('Contract not found')

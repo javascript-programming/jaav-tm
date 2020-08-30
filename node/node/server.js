@@ -30,7 +30,8 @@ class TendermintNode {
             },
             rpc       : {
                 laddr   : this.rpcUrl
-            }
+            },
+            trace: true
         });
 
         node.stdout.pipe(process.stdout);

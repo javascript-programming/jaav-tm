@@ -1,4 +1,5 @@
 const Commands = require('./commands');
+const Mongo = require('./abci/mongo');
 
 const commands = new Commands();
 const options = commands.getOptions().options;
@@ -7,7 +8,12 @@ if (options.node) {
     const AbciServer = require('./abci/server');
     const TendermintNode = require('./node/server');
 
-    const abciServer = new AbciServer();
+    const abciServer = new AbciServer(new Mongo(
+        options.mhost, options.mport,
+        options.muser || options.node,
+        options.mpassword || options.node,
+        options.mdatabase || options.node
+    ));
 
     const WalletHandler = require('./handlers/wallet');
     abciServer.use(WalletHandler);
