@@ -12,6 +12,7 @@
     "fs-extra": "^7.0.0",
     "http": "0.0.0",
     "json-stable-stringify": "^1.0.1",
+    "mongodb": "^3.6.0",
     "node-getopt": "^0.3.2",
     "path": "^0.12.7",
     "readline-utils": "^2.2.3",

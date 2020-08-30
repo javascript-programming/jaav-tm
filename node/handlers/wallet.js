@@ -9,19 +9,22 @@ class WalletHandler {
         if (tx.params.account !== tx.account)
             throw new Error('Account origin should be sender');
 
-        if (state.accounts[tx.params.account])
+        if (state.getAccount(tx.params.account))
             throw new Error('Account already exists');
 
-        state.accounts[tx.params.account] = {
+        const newAccount = {
+            _id: tx.params.account,
             balance: 1000,
             cashbook: []
         };
+
+        state.insertRecord(newAccount, 'accounts');
 
         return {
             log     : 'Account created',
             result  : {
                 address : tx.params.account,
-                balance : state.accounts[tx.params.account].balance
+                balance : newAccount.balance
             }
         }
     }
@@ -29,25 +32,31 @@ class WalletHandler {
     //code almost the sa,e as in contract
     static transfer_funds (state, tx) {
 
+        const fromAccount = state.getAccount[tx.account];
+
         if (Number.isInteger(tx.value) && tx.value > 0) {
 
-            if (!state.accounts[tx.to] && !state.contracts[tx.to]) {
+            let toAccount = state.getAccount(tx.to) || state.getContract(tx.to);
+
+
+            if (!toAccount) {
                 throw new Error('Be happy! No funds are lost while you have sent your funds into the blue.');
             }
 
-            if (state.accounts[tx.account].balance >= tx.value) {
+            if (fromAccount.balance >= tx.value) {
 
-                const receiver = state.accounts[tx.to] || state.contracts[tx.to];
-
-                receiver.balance += tx.value;
-                state.accounts[tx.account].balance -= tx.value;
+                toAccount.balance += tx.value;
+                fromAccount.balance -= tx.value;
 
                 let message = tx.params.message;
                 let cashRecord = { from: tx.account, amount: tx.value, message };
-                receiver.cashbook.push(cashRecord);
+                toAccount.cashbook.push(cashRecord);
 
                 cashRecord = { to: tx.to, amount: tx.value, message };
-                state.accounts[tx.account].cashbook.push(cashRecord);
+                fromAccount.cashbook.push(cashRecord);
+
+                state.updateRecord(toAccount._id, toAccount, toAccount.abi? 'contracts' : 'accounts');
+                state.updateRecord(fromAccount._id, fromAccount, 'accounts');
 
             } else {
                 throw new Error('Insufficient funds you have!');
@@ -59,7 +68,7 @@ class WalletHandler {
 
         return {
             log     : 'Balance updated',
-            result  : state.accounts[tx.account]
+            result  : fromAccount
         };
     }
 }

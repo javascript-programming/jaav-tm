@@ -1,9 +1,9 @@
 {
-  "genesis_time": "2018-09-09T12:16:01.41322725Z",
+  "genesis_time": "2020-08-27T15:19:37.88526147Z",
   "chain_id": "test-chain-c8XNNu",
   "consensus_params": {
     "block_size_params": {
-      "max_txs_bytes": "22020096",
+      "max_bytes": "22020096",
       "max_gas": "-1"
     },
     "tx_size_params": {

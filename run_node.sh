@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
-node ./node/app.js -n $1 -r $2
+node -v
+node ./node/app.js -n single -r 3000
 
 

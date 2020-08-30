@@ -248,9 +248,7 @@ class Contracts {
             params = params.split(',');
         }
 
-        return await this.client.query(`contracts/${address}`, { account, params, fn }).catch((err) => {
-            console.log(err);
-        });
+        return await this.client.query(`contracts/${address}`, { account, params, fn });
     }
 
     callContract (account, password, address, fn, value, ...params) {

@@ -8,7 +8,12 @@ module.exports = class Commands {
             ['d',       'home=PATH'               , 'HOME data path'],
             ['a',       'abci=PORT'               , 'ABCI port (default 46658)'     ],
             ['n',       'node=PATH'               , 'Node name in configurations folder'],
-            ['r',       'rpc=PORT'                , 'Start rpc client and console (default 3000)'   ]
+            ['r',       'rpc=PORT'                , 'Start rpc client and console (default 3000)'],
+            ['M',       'mhost=ARG'               , 'Mongodb host (default 127.0.0.1)'],
+            ['P',       'mport=PORT'              , 'Mongodb port (default 27017)'],
+            ['u',       'muser=ARG'               , 'Mongodb user (default node name)'],
+            ['p',       'mpassword=ARG'           , 'Mongodb password'],
+            ['D',       'mdatabase=ARG'           , 'Mongodb database (default node name)']
         ]);
 
         this.getopt.setHelp(
