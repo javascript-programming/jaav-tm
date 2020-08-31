@@ -24,8 +24,7 @@ class ABCIServer {
             this.getCheckTxHandler(),
             this.getDeliveryTxHandler(),
             this.getCommitHandler());
-
-        this.server = server(coreHandlers);
+            this.server = server(coreHandlers);
     }
 
     use (handler) {
@@ -105,38 +104,41 @@ class ABCIServer {
 
         const deliverTx = (request, check) => {
 
-            try {
-                const transaction = this.getTransaction(request);
+            const state = this.stateManager.state;
 
-                if (!TU.verifyTx(transaction))
-                    throw new Error('Signature not valid');
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const transaction = this.getTransaction(request);
 
-                let receipt = {};
-                let tags = [];
+                    if (!TU.verifyTx(transaction))
+                        throw new Error('Signature not valid');
 
-                if (!check) {
-                    this.stateManager.beginTransaction();
-                    const state = this.stateManager.state;
-                    const handler = this.getHandler(transaction);
-                    handler(state, transaction, this.stateManager.chainInfo);
-                    this.stateManager.endTransaction();
-                    if (receipt.tags) {
-                        tags = receipt.tags;
+                    let receipt = {};
+                    let tags = [];
+
+                    if (!check) {
+                        this.stateManager.beginTransaction(state);
+                        const handler = this.getHandler(transaction);
+                        await handler(state, transaction, this.stateManager.chainInfo);
+                        await this.stateManager.endTransaction(state);
+
+                        if (receipt.tags) {
+                            tags = receipt.tags;
+                        }
                     }
+
+                    resolve({
+                        code    : 0,
+                        log     : receipt.log || 'tx succeeded',
+                        tags    : tags,
+                        data    : Buffer.from(stringify(receipt.result || {}))
+                    });
+
+                } catch (err) {
+                    await this.stateManager.abortTransaction(state);
+                    resolve({ code: 1, log: err.message });
                 }
-
-                return {
-                    code    : 0,
-                    log     : receipt.log || 'tx succeeded',
-                    tags    : tags,
-                    data    : Buffer.from(stringify(receipt.result || {}))
-                }
-
-
-            } catch (err) {
-                this.stateManager.abortTransaction();
-                return { code: 1, log: err.message }
-            }
+            });
         };
 
         return { deliverTx }
@@ -144,9 +146,12 @@ class ABCIServer {
 
     getCommitHandler () {
         const commit = (request) => {
-            return {
-                data : this.stateManager.hash
-            }
+            return new Promise (async (resolve, reject) => {
+                const hash = await this.stateManager.hash;
+                resolve({
+                    data : hash
+                });
+            });
         };
 
         return { commit }
@@ -163,7 +168,10 @@ class ABCIServer {
     }
 
     start (port = 46658) {
-        this.server.listen(port);
+        this.stateManager.connect().then(()=> {
+            this.server.listen(port);
+        });
+
     }
 }
 

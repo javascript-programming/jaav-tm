@@ -6,27 +6,33 @@ class WalletHandler {
 
     static create_account (state, tx) {
 
-        if (tx.params.account !== tx.account)
-            throw new Error('Account origin should be sender');
-
-        if (state.getAccount(tx.params.account))
-            throw new Error('Account already exists');
-
-        const newAccount = {
-            _id: tx.params.account,
-            balance: 1000,
-            cashbook: []
-        };
-
-        state.insertRecord(newAccount, 'accounts');
-
-        return {
-            log     : 'Account created',
-            result  : {
-                address : tx.params.account,
-                balance : newAccount.balance
+        return new Promise(async (resolve, reject) => {
+            if (tx.params.account !== tx.account) {
+                reject('Account origin should be sender');
+                return;
             }
-        }
+
+            if (await state.getAccount(tx.params.account)) {
+                reject('Account already exists');
+                return;
+            }
+
+            const newAccount = {
+                _id: tx.params.account,
+                balance: 1000,
+                cashbook: []
+            };
+
+            await state.insertRecord(newAccount, 'accounts');
+
+            return {
+                log     : 'Account created',
+                result  : {
+                    address : tx.params.account,
+                    balance : newAccount.balance
+                }
+            }
+        });
     }
 
     //code almost the sa,e as in contract

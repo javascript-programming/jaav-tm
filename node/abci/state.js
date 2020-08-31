@@ -4,24 +4,40 @@ class State {
 
         const me = this;
 
-        me.getAccount = async (id) => {
-            return await mongo.database.accounts.find({ _id: id }).toArray()[0];
+        me.getAccount = (id) => {
+            return new Promise((resolve, reject) => {
+                mongo.database.accounts.find({ _id: id }).then(cursor => {
+                    resolve(cursor.toArray()[0]);
+                }).catch(reject);
+            });
         };
 
-        me.getContract = async (id) => {
-            return await mongo.database.contracts.find({ _id: id }).toArray()[0];
+        me.getContract = (id) => {
+            return new Promise((resolve, reject) => {
+                mongo.database.contracts.find({ _id: id }).then(cursor => {
+                    resolve(cursor.toArray()[0]);
+                }).catch(reject);
+            });
         };
 
         me.getRecord = async (id, collection) => {
-           return await mongo.database[collection].find({ _id: id }).toArray()[0];
+            return new Promise((resolve, reject) => {
+                mongo.database[collection].find({ _id: id }).then(cursor => {
+                    resolve(cursor.toArray()[0]);
+                }).catch(reject);
+            });
         };
 
         me.insertRecord = async (record, collection) => {
-            return await mongo.database[collection].insert(record, { session: mongo.session });
+            return new Promise((resolve, reject) => {
+                mongo.database[collection].insert(record, { session: mongo.session }).then(resolve).catch(reject)
+            });
         };
 
         me.updateRecord = async (id, update, collection) => {
-            return await mongo.database[collection].update({ _id : id},{ $set: update }, { session: mongo.session });
+            return new Promise((resolve, reject) => {
+                mongo.database[collection].update({ _id : id},{ $set: update }, { session: mongo.session }).then(resolve).catch(reject)
+            });
         };
     }
 }

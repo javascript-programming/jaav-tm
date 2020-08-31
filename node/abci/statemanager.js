@@ -1,7 +1,7 @@
 const TU = require('../common/transactionutils');
 const stringify = require('json-stable-stringify');
 const ContractHandler = require('../handlers/contract');
-const state = require('./state');
+const State = require('./state');
 
 // https://cloud.mongodb.com/freemonitoring/cluster/S4CO3VG5OV6MG64NCWT5L4ZKZDJ3LNLF
 
@@ -10,19 +10,26 @@ class StateManager {
 
     constructor (mongo) {
         this.mongo = mongo;
-        this.state = new State(mongo);
     }
 
-    beginTransaction () {
-        this.mongo.beginTransaction();
+    get state () {
+        return new State(this.mongo);
     }
 
-    abortTransaction () {
-        this.mongo.abortTransaction();
+    connect () {
+        return this.mongo.connect();
     }
 
-    endTransaction () {
-        this.mongo.endTransaction();
+    beginTransaction (state) {
+        this.mongo.beginTransaction(state);
+    }
+
+    abortTransaction (state) {
+        return this.mongo.abortTransaction(state);
+    }
+
+    endTransaction (state) {
+        return this.mongo.endTransaction(state);
     }
 
     set chainInfo (value) {
@@ -34,30 +41,37 @@ class StateManager {
     }
 
     get hash () {
-        return TU.sha256(stringify(this.mongo.getHash()));
+        return new Promise ((resolve, reject) => {
+            this.mongo.getHash().then(hash => {
+                resolve(TU.sha256(stringify(hash)));
+            }).catch(reject);
+        });
     }
 
-    getPathData (path) {
+    getPathData (path, state) {
+        return new Promise((resolve, reject) => {
+            const collection = path[0];
+            const id = path[1];
 
-        const collection = path[0];
-        const id = path[1];
-
-        if (!collection && !id) {
-            throw new Error(`Collection ${path.join('/')} and id not set`);
-        }
-
-        let result = {};
-        result[collection] = {};
-        result[collection][id] = this.state.getRecord(id, collection);
-
-        for (let i = 0; i < path.length; i++) {
-            result = result[path[i]];
-            if (!result) {
-                throw new Error(`Data path ${path.join('/')} not found`);
+            if (!collection && !id) {
+                reject(`Collection ${path.join('/')} and id not set`);
+                return;
             }
-        }
 
-        return result;
+            let result = {};
+            result[collection] = {};
+            state.getRecord(id, collection).then(record => {
+                result[collection][id] = record;
+                for (let i = 0; i < path.length; i++) {
+                    result = result[path[i]];
+                    if (!result) {
+                        reject(`Data path ${path.join('/')} not found`);
+                        return;
+                    }
+                }
+                resolve(result);
+            }).catch(reject);
+        });
     }
 
     query (request) {
@@ -71,28 +85,29 @@ class StateManager {
             code  : 1
         };
 
-        try {
+        return new Promise(async (resolve, reject) => {
+            const state = this.state;
+            try {
+                const params = TU.parseJson(Buffer.from(request.data));
+                const data = await this.getPathData(path, state);
+                this.beginTransaction(state);
+                if (params.fn) {
+                    result.value = await ContractHandler.query_contract(state, params.account, data, params.fn, params.params);
+                } else {
+                    result.value = data;
+                }
+                await this.endTransaction(state);
+                result.value = Buffer.from(stringify(result.value || {}));
+                result.proof = TU.sha256(result.value);
+                result.code = 0;
+                resolve(result);
 
-            const params = TU.parseJson(Buffer.from(request.data));
-
-            this.beginTransaction();
-            if (params.fn) {
-                result.value = ContractHandler.query_contract(this.state, params.account, this.getPathData(path), params.fn, params.params);
-            } else {
-                result.value = this.getPathData(path);
+            } catch (err) {
+                this.abortTransaction(state);
+                result.log = err.message;
+                resolve(result);
             }
-            this.endTransaction();
-
-            result.value = Buffer.from(stringify(result.value || {}));
-
-            result.proof = TU.sha256(result.value);
-            result.code = 0;
-        } catch (err) {
-            this.abortTransaction();
-            result.log = err.message;
-        }
-
-        return result;
+        });
     }
 
 }

@@ -3,59 +3,64 @@ const { MongoClient } = require('mongodb');
 class Mongo {
 
     constructor (host = 'jaav.eu', port = 27017, user, password, database) {
-        this.client = new MongoClient("mongodb://" + user + ":" + password + "@" + host + ":" + port + "/" + database);
+        this.client = new MongoClient("mongodb://" + user + ":" + password + "@" + host + ":" + port + "/" + database, { poolSize: 20, useNewUrlParser: true, useUnifiedTopology: true });
     }
 
-    async connect () {
-        this.isConnected = true;
-        this.connection = await this.client.connect();
+     connect () {
+        const me = this;
+        return new Promise((resolve, reject) => {
+            me.connection = this.client.connect().then(connection => {
+                me.connection = connection;
+                me.isConnected = true;
+                resolve(me.connection);
+            }).catch(reject);
+        });
     }
 
     get database () {
         return this.client.db();
     }
 
-    async getHash () {
-
-        const wasConnected = this.isConnected;
-        if (!this.isConnected)
-            this.connect();
-
-        const result = await this.database.command({ dbHash: 1 });
-
-        if (!wasConnected)
-            this.close();
-
-        return result.md5;
+    getHash () {
+        return new Promise((resolve, reject) => {
+            this.database.command({ dbHash: 1 }).then(result => {
+                resolve(result.md5);
+            }).catch(reject);
+        });
     }
 
-    async beginTransaction () {
-        this.connect();
-        this.session = this.client.startSession();
-        this.session.startTransaction();
+    beginTransaction (state) {
+        state.session = this.client.startSession();
+        state.session.startTransaction();
     }
 
-    async abortTransaction () {
-
-        if (this.session) {
-            await this.session.abortTransaction();
-            this.session.endSession();
-        }
-
-        this.close();
+    abortTransaction (state) {
+        return new Promise((resolve, reject) => {
+            if (state.session) {
+                state.session.abortTransaction().then(() => {
+                    state.session.endSession();
+                    state.session = null;
+                    resolve();
+                }).catch(reject);
+            } else {
+                resolve();
+            }
+        });
     }
 
-    async endTransaction () {
-        await this.session.commitTransaction();
-        this.session.endSession();
-        this.close();
+    endTransaction (state) {
+        return new Promise((resolve, reject) => {
+            state.session.commitTransaction().then(() => {
+                state.session.endSession();
+                state.session = null;
+                resolve();
+            }).catch(reject);
+        });
     }
 
-    async close () {
+     async close () {
         await this.client.close(true);
-        this.isConnected = false;
         this.connection = null;
-        this.session = null;
     }
 
 }
