@@ -3,7 +3,8 @@ const { MongoClient } = require('mongodb');
 class Mongo {
 
     constructor (host = 'jaav.eu', port = 27017, user, password, database) {
-        this.client = new MongoClient("mongodb://" + user + ":" + password + "@" + host + ":" + port + "/" + database, { poolSize: 20, useNewUrlParser: true, useUnifiedTopology: true });
+        this.client = new MongoClient("mongodb://" + user + ":" + password + "@" + host + ":" + port + "/" + database
+            , { poolSize: 20, useNewUrlParser: true, useUnifiedTopology: true, retryWrites: false});
     }
 
      connect () {
