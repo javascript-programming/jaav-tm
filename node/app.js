@@ -21,7 +21,16 @@ if (options.node) {
     const ContractHandler = require('./handlers/contract');
     abciServer.use(ContractHandler);
 
-    const tendermintNode = new TendermintNode(options.home, options.node, options.tendermint, options.abci);
+    switch (options.rebuild) {
+        case "0":
+        case "false":
+            options.rebuild = false;
+            break;
+        default:
+            options.rebuild = true;
+    }
+
+    const tendermintNode = new TendermintNode(options.home, options.node, options.tendermint, options.abci, options.rebuild);
 
     abciServer.start(options.abci);
 

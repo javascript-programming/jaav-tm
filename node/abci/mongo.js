@@ -13,8 +13,18 @@ class Mongo {
             me.connection = this.client.connect().then(connection => {
                 me.connection = connection;
                 me.isConnected = true;
-                resolve(me.connection);
+                this.clearDatabase().then(resolve);
             }).catch(reject);
+        });
+    }
+
+    clearDatabase () {
+        return new Promise(async (resolve, reject) => {
+            const collections = await this.database.collections();
+            for (let i = 0; i < collections.length; i++) {
+                await collections[i].drop();
+            }
+            resolve();
         });
     }
 

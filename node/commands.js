@@ -13,7 +13,8 @@ module.exports = class Commands {
             ['P',       'mport=PORT'              , 'Mongodb port (default 27017)'],
             ['u',       'muser=ARG'               , 'Mongodb user (default node name)'],
             ['p',       'mpassword=ARG'           , 'Mongodb password'],
-            ['D',       'mdatabase=ARG'           , 'Mongodb database (default node name)']
+            ['D',       'mdatabase=ARG'           , 'Mongodb database (default node name)'],
+            ['R',       'rebuild=ARG'             , 'Recreate chain, remove state and all data (default false)'],
         ]);
 
         this.getopt.setHelp(
