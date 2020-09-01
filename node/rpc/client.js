@@ -124,7 +124,9 @@ class RPCClient {
 
                 if (code === 0) {
                     data.result = data.result.deliver_tx;
-                    data.result.data = TU.convertObjectToHex(TU.parsePayload(data.result.data));
+                    try {
+                        data.result.data = TU.convertObjectToHex(TU.parsePayload(data.result.data));
+                    } catch(err) {}
                 } else {
                     data.result = data.result.check_tx;
                 }

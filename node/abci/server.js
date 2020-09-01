@@ -107,6 +107,11 @@ class ABCIServer {
             const state = this.stateManager.state;
 
             return new Promise(async (resolve, reject) => {
+
+                const errorHandler = (err) => {
+                    throw new Error(err.message || err);
+                };
+
                 try {
                     const transaction = this.getTransaction(request);
 
@@ -119,8 +124,8 @@ class ABCIServer {
                     if (!check) {
                         this.stateManager.beginTransaction(state);
                         const handler = this.getHandler(transaction);
-                        await handler(state, transaction, this.stateManager.chainInfo);
-                        await this.stateManager.endTransaction(state);
+                        receipt = await handler(state, transaction, this.stateManager.chainInfo).catch(errorHandler);
+                        await this.stateManager.endTransaction(state).catch(errorHandler);
 
                         if (receipt.tags) {
                             tags = receipt.tags;
