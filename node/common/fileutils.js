@@ -12,6 +12,10 @@ class Fileutils {
         }
     }
 
+    static exists (path) {
+        return fs.existsSync(path);
+    }
+
     static makeDirWhenNotExists (path) {
 
         if (!fs.existsSync(path)) {
