@@ -1,6 +1,14 @@
 ### Install
 
-Requires node 8+ (not tested with 10)
+Requires MongoDb in replication mode
+
+*update The statemanager in storing it state in a mongo database. 
+
+To install mongodb https://docs.mongodb.com/manual/installation
+
+Due to hash comparison between databases it is preferred all nodes have the same mongodb version. Tested with MongoDb v4.4.
+
+Requires node 10+ (not tested with v11.14.0)
 
 https://nodejs.org/en/
 
@@ -17,7 +25,26 @@ Install node packages and set execute permission
 
 Pass as params the configuration `single` (folder name in `configurations` folder) and rpc port `3000`. Note: `node0` and `node1` are used for a chain with two validators
 
-    ./run_node.sh single 3000
+    ./run_node.sh single 3000 -R
+    
+The -R option will recreate a new chain on each startup. Set it to false (or omit it) the reuse the same chain. Mongo connection options should be passed 
+to the node else it will default all (database, user and password) to the node name.
+
+Available options 
+
+```
+     ['t',       'tendermint=PORT'         , 'Tendermint port (default 46657)'],
+     ['d',       'home=PATH'               , 'HOME data path'],
+     ['a',       'abci=PORT'               , 'ABCI port (default 46658)'     ],
+     ['n',       'node=PATH'               , 'Node name in configurations folder'],
+     ['r',       'rpc=PORT'                , 'Start rpc client and console (default 3000)'],
+     ['M',       'mhost=ARG'               , 'Mongodb host (default 127.0.0.1)'],
+     ['P',       'mport=PORT'              , 'Mongodb port (default 27017)'],
+     ['u',       'muser=ARG'               , 'Mongodb user (default node name)'],
+     ['p',       'mpassword=ARG'           , 'Mongodb password (default node name)'],
+     ['D',       'mdatabase=ARG'           , 'Mongodb database (default node name)'],
+     ['R',       'rebuild=ARG'             , 'Recreate chain, remove state and all data (default false)'],
+```
 
 ### Console webclient
 
@@ -93,6 +120,41 @@ Open the Chrome console on http://localhost:3000/page. If all is running correct
 For example, a call made from node `5.157.85.181` will result on `5.157.85.76` in:
 
 ![Alt text](images/receive_call_helloworld.png?raw=true "Receive notification from contract")
+
+### Database access in contracts
+
+On each instance of a contract a `database` property is set. This property contains functions to handle the associated contract collection. 
+For each deployed contract a database mondgodb collection is created. Contracts have read and write access to this collection. Read operation can
+be performed on the entire database. In that case pass the address (which is the collection name) to the query function.
+
+```
+        setData(data) {
+            return this.database.insert(data);
+        }
+    
+        getData(query) {
+            return this.database.query(query);
+        }
+```
+
+Functions which do database calls should return a Promise always. 
+
+The available functions are. 
+
+Read operation over the entire state or database
+
+- getAccount(address)
+- getContract(address)
+- query(query, collection, first = false) (collection defaults to contract address)
+
+There are two static collections (`accounts` and `contracts`) on which can be searched on address as id. Other collections are contract addresses.
+
+- insert(record)
+- updateById(id, update)
+- update(filter, update) 
+
+These functions can only be performed on the contract collection.   
+
 
 ### RPC
 
