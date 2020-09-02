@@ -2,7 +2,7 @@
 
 Requires MongoDb in replication mode
 
-*update The statemanager in storing it state in a mongo database. 
+*update The statemanager in storing its state in a mongo database. 
 
 To install mongodb https://docs.mongodb.com/manual/installation
 
@@ -127,6 +127,7 @@ On each instance of a contract a `database` property is set. This property conta
 For each deployed contract a database mondgodb collection is created. Contracts have read and write access to this collection. Read operation can
 be performed on the entire database. In that case pass the address (which is the collection name) to the query function.
 
+As an example two functions are added to the HelloWorld contract.
 ```
         setData(data) {
             return this.database.insert(data);
@@ -155,6 +156,7 @@ There are two static collections (`accounts` and `contracts`) on which can be se
 
 These functions can only be performed on the contract collection.   
 
+![Alt text](images/setdata_helloworld.png?raw=true")
 
 ### RPC
 
