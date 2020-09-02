@@ -90,20 +90,20 @@ class StateManager {
             try {
                 const params = TU.parseJson(Buffer.from(request.data));
                 const data = await this.getPathData(path, state);
-                this.beginTransaction(state);
+                //this.beginTransaction(state);
                 if (params.fn) {
                     result.value = await ContractHandler.query_contract(state, params.account, data, params.fn, params.params);
                 } else {
                     result.value = data;
                 }
-                await this.endTransaction(state);
+                //await this.endTransaction(state);
                 result.value = Buffer.from(stringify(result.value || {}));
                 result.proof = TU.sha256(result.value);
                 result.code = 0;
                 resolve(result);
 
             } catch (err) {
-                this.abortTransaction(state);
+                //this.abortTransaction(state);
                 result.log = err.message;
                 resolve(result);
             }

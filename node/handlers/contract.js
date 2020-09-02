@@ -4,28 +4,33 @@ const TU = require('../common/transactionutils');
 function executeContract (contract, state, fn, params, account, value) {
 
     return new Promise(async (resolve, reject) => {
-        if (contract.abi[fn]) {
 
-            const code = Buffer.from(contract.code, 'base64').toString();
-            const Cls = CU.getClass(code);
-            const instance = new Cls(state);
+        try {
+            if (contract.abi[fn]) {
 
-            instance.caller = account;
-            instance.value = value;
+                const code = Buffer.from(contract.code, 'base64').toString();
+                const Cls = CU.getClass(code);
+                const instance = new Cls(state);
 
-            const fnRef = instance[fn];
+                instance.caller = account;
+                instance.value = value;
 
-            resolve({
-                result : (fnRef instanceof Promise) ? await fnRef.apply(instance, params) : fnRef.apply(instance, params),
-                state  : instance.state,
-                tags   : [
-                    { key : Buffer.from('jv.contract'), value : Buffer.from(contract.address) },
-                    { key : Buffer.from('jv.event'), value : Buffer.from(fn) }
-                ]
-            });
+                const fnRef = instance[fn];
 
-        } else {
-            reject('Function not found in contract');
+                resolve({
+                    result: (fnRef instanceof Promise) ? await fnRef.apply(instance, params) : fnRef.apply(instance, params),
+                    state : instance.state,
+                    tags  : [
+                        {key: Buffer.from('jv.contract'), value: Buffer.from(contract.address)},
+                        {key: Buffer.from('jv.event'), value: Buffer.from(fn)}
+                    ]
+                });
+
+            } else {
+                reject('Function not found in contract');
+            }
+        } catch(err) {
+            reject(err.message);
         }
     });
 }
@@ -95,23 +100,33 @@ class ContractHandler {
     static call_contract (state, tx) {
 
         return new Promise(async (resolve, reject) => {
-            const contract = await state.getContract(tx.to);
-            const account = await state.getAccount(tx.account);
 
-            if (contract) {
+            try {
+                const contract = await state.getContract(tx.to);
+                const account = await state.getAccount(tx.account);
 
-                if (!account)
-                    reject('Caller account unknown');
+                if (contract) {
 
-                //todo check value and balance sender
-                const result = await executeContract(contract, contract.state, tx.params.fn, tx.params.params, tx.account, tx.value);
-                resolve({
-                    log     : 'Contract call executed',
-                    result  : result.result,
-                    tags    : result.tags
-                });
-            } else {
-                reject('Contract not found');
+                    if (!account) {
+                        reject('Caller account unknown');
+                        return;
+                    }
+
+                    //todo check value and balance sender
+                    const result = await executeContract(contract, contract.state, tx.params.fn, tx.params.params, tx.account, tx.value);
+                    await state.updateRecord(tx.to, { state : contract.state }, 'contracts');
+
+                    resolve({
+                        log   : 'Contract call executed',
+                        result: result.result,
+                        tags  : result.tags
+                    });
+
+                } else {
+                    reject('Contract not found');
+                }
+            } catch (err) {
+                reject(err.message);
             }
         });
     }
@@ -119,20 +134,25 @@ class ContractHandler {
     static query_contract (state, account, contract, fn, params) {
 
         return new Promise(async (resolve, reject) => {
-            if (contract) {
 
-                const caller = await state.getAccount(account);
+            try {
+                if (contract) {
 
-                if (!caller) {
-                    reject('Caller account unknown');
-                    return;
+                    const caller = await state.getAccount(account);
+
+                    if (!caller) {
+                        reject('Caller account unknown');
+                        return;
+                    }
+
+                    const result = await executeContract(contract, contract.state, fn, params, account);
+                    resolve(result.result);
+
+                } else {
+                    reject('Contract not found');
                 }
-
-                const result = await executeContract(contract, contract.state, fn, params, account);
-                resolve(result.result);
-
-            } else {
-                reject('Contract not found');
+            } catch (err) {
+                reject(err.message);
             }
         });
     }
@@ -142,49 +162,58 @@ class ContractHandler {
     static transfer_funds (state, tx) {
 
         return new Promise(async (resolve, reject) => {
-            const fromContract = await state.getContract(tx.account);
 
-            if (Number.isInteger(tx.value) && tx.value > 0) {
+            try {
 
-                let toAccount = await state.getAccount(tx.to) || await state.getContract(tx.to);
+                const fromContract = await state.getContract(tx.account);
 
-                if (!toAccount) {
-                    reject('Be happy! No funds are lost while you have sent your funds into the blue.');
+                if (!fromContract) {
+                    reject("This contract (" + tx.account + ") doesn't exist");
                     return;
                 }
 
-                if (fromContract.balance >= tx.value) {
+                if (Number.isInteger(tx.value) && tx.value > 0) {
 
-                    toAccount.balance += tx.value;
-                    fromContract.balance -= tx.value;
+                    let toAccount = await state.getAccount(tx.to) || await state.getContract(tx.to);
 
-                    let message = tx.params.message;
-                    let cashRecord = { from: tx.account, amount: tx.value, message };
-                    toAccount.cashbook.push(cashRecord);
+                    if (!toAccount) {
+                        reject('Be happy! No funds are lost while you have sent your funds into the blue.');
+                        return;
+                    }
 
-                    cashRecord = { to: tx.to, amount: tx.value, message };
-                    fromContract.cashbook.push(cashRecord);
+                    if (fromContract.balance >= tx.value) {
 
-                    await state.updateRecord(toAccount._id, toAccount, toAccount.abi? 'contracts' : 'accounts');
-                    await state.updateRecord(fromContract._id, fromContract, 'contracts');
+                        toAccount.balance += tx.value;
+                        fromContract.balance -= tx.value;
+
+                        let message = tx.params.message;
+                        let cashRecord = {from: tx.account, amount: tx.value, message};
+                        toAccount.cashbook.push(cashRecord);
+
+                        cashRecord = {to: tx.to, amount: tx.value, message};
+                        fromContract.cashbook.push(cashRecord);
+
+                        await state.updateRecord(toAccount._id, toAccount, toAccount.abi ? 'contracts' : 'accounts');
+                        await state.updateRecord(fromContract._id, fromContract, 'contracts');
+
+                    } else {
+                        reject('Insufficient funds you have!');
+                        return;
+                    }
 
                 } else {
-                    reject('Insufficient funds you have!');
+                    reject('Value should be positive integer');
                     return;
                 }
 
-            } else {
-                reject('Value should be positive integer');
-                return;
+                resolve({
+                    log   : 'Contract balance updated',
+                    result: fromContract
+                });
+            } catch (err) {
+                reject(err.message);
             }
-
-            resolve({
-                log     : 'Contract balance updated',
-                result  : fromContract.balance
-            });
         });
-
-
     }
 
 }

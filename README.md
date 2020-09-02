@@ -43,7 +43,7 @@ Open the Chrome console on http://localhost:3000/page. If all is running correct
 
  To change the password of an account use `changePassword (account, oldPassword, newPassword)`
 
-        > await webclient.changePassword(account[0], '1234', 'newpassword')
+        > await webclient.changePassword(accounts[0], '1234', 'newpassword')
 
 ##### Contract functions
 
