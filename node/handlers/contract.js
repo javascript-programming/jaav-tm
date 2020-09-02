@@ -14,6 +14,7 @@ function executeContract (contract, state, fn, params, account, value) {
 
                 instance.caller = account;
                 instance.value = value;
+                instance.database = contract.database;
 
                 const fnRef = instance[fn];
 
@@ -113,6 +114,7 @@ class ContractHandler {
                     }
 
                     //todo check value and balance sender
+                    contract.database = state.getContractDatabase(contract.address, true);
                     const result = await executeContract(contract, contract.state, tx.params.fn, tx.params.params, tx.account, tx.value);
                     await state.updateRecord(tx.to, { state : contract.state }, 'contracts');
 
@@ -145,6 +147,7 @@ class ContractHandler {
                         return;
                     }
 
+                    contract.database = state.getContractDatabase(contract.address, false);
                     const result = await executeContract(contract, contract.state, fn, params, account);
                     resolve(result.result);
 

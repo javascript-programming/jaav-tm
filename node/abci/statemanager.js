@@ -104,7 +104,7 @@ class StateManager {
 
             } catch (err) {
                 //this.abortTransaction(state);
-                result.log = err.message;
+                result.log = err && err.message;
                 resolve(result);
             }
         });
