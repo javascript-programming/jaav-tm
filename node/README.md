@@ -26,13 +26,19 @@ The `common` folder contains utils used by all other packages. Like crypto and e
 Defined in `commands.js`
 
 
-            this.getopt = new Getopt([
-                ['t',       'tendermint=PORT'         , 'Tendermint port (default 46657)'],
-                ['d',       'home=PATH'               , 'HOME data path'],
-                ['a',       'abci=PORT'               , 'ABCI port (default 46658)'     ],
-                ['n',       'node=PATH'               , 'Node name in configurations folder'],
-                ['r',       'rpc=PORT'                , 'Start rpc client and console (default 3000)'   ]
-            ]);
+            tthis.getopt = new Getopt([
+                         ['t',       'tendermint=PORT'         , 'Tendermint port (default 46657)'],
+                         ['d',       'home=PATH'               , 'HOME data path'],
+                         ['a',       'abci=PORT'               , 'ABCI port (default 46658)'     ],
+                         ['n',       'node=PATH'               , 'Node name in configurations folder'],
+                         ['r',       'rpc=PORT'                , 'Start rpc client and console (default 3000)'],
+                         ['M',       'mhost=ARG'               , 'Mongodb host (default 127.0.0.1)'],
+                         ['P',       'mport=PORT'              , 'Mongodb port (default 27017)'],
+                         ['u',       'muser=ARG'               , 'Mongodb user (default node name)'],
+                         ['p',       'mpassword=ARG'           , 'Mongodb password (default node name)'],
+                         ['D',       'mdatabase=ARG'           , 'Mongodb database (default node name)'],
+                         ['R',       'rebuild=ARG'             , 'Recreate chain, remove state and all data (default false)'],
+                     ]);
 
 Main entry point is `app.js`
 
