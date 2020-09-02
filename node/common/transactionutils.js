@@ -42,13 +42,13 @@ class TransActionUtils {
 
     static signByAccount (message, privKey) {
         const mess = Buffer.from(this.sha256(message), 'utf-8');
-        const sign = secp.sign(mess, new Buffer(privKey, "hex"));
+        const sign = secp.sign(mess, Buffer.from(privKey, "hex"));
         return sign.signature;
     }
 
     static verifyByAccount (message, signature, account, pubKey) {
         const mess = Buffer.from(this.sha256(message), 'utf-8');
-        return secp.verify(mess, signature, new Buffer(pubKey, 'hex')) && account === this.addressHash(pubKey);
+        return secp.verify(mess, signature, Buffer.from(pubKey, 'hex')) && account === this.addressHash(pubKey);
     }
 
     static clone (obj) {
@@ -59,7 +59,7 @@ class TransActionUtils {
 
         let result = false;
         try {
-            result = pubKey === secp.publicKeyCreate(new Buffer(privKey, "hex")).toString('hex');
+            result = pubKey === secp.publicKeyCreate(Buffer.from(privKey, "hex")).toString('hex');
         } catch(ex){}
 
         return result;

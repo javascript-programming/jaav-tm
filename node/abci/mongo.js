@@ -61,11 +61,14 @@ class Mongo {
 
     endTransaction (state) {
         return new Promise((resolve, reject) => {
-            state.session.commitTransaction().then(() => {
-                state.session.endSession();
-                state.session = null;
-                resolve();
-            }).catch(reject);
+            if (state.session) {
+                state.session.commitTransaction().then(() => {
+                    state.session.endSession();
+                    state.session = null;
+                    resolve();
+
+                }).catch(reject);
+            } else (resolve())
         });
     }
 

@@ -104,9 +104,9 @@ class ABCIServer {
 
         const deliverTx = (request, check) => {
 
-            const state = this.stateManager.state;
-
             return new Promise(async (resolve, reject) => {
+
+                const state = this.stateManager.state;
 
                 const errorHandler = (err) => {
                     throw new Error(err.message || err);

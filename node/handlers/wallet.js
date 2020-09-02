@@ -48,7 +48,12 @@ class WalletHandler {
 
             try {
 
-                const fromAccount = await state.getAccount[tx.account];
+                const fromAccount = await state.getAccount(tx.account);
+
+                if (!fromAccount) {
+                    reject("This account (" + tx.account + ") doesn't exist");
+                    return;
+                }
 
                 if (Number.isInteger(tx.value) && tx.value > 0) {
 
