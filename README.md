@@ -69,7 +69,7 @@ Open the Chrome console on http://localhost:3000/page if you want to use the mod
 * note: The bundles page is found on root http://localhost:port
 
 
-###To see it working installed
+### To see it working installed
 
 In this network two nodes are running:
 
