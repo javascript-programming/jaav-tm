@@ -6,3 +6,4 @@
 /page/node_modules/
 !/node_modules/abci/
 /examples/
+/node/rpc/cert/
