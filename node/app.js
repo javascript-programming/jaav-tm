@@ -44,7 +44,7 @@ if (options.node) {
 const startRpc = () => {
 
     const RPCServer = require('./rpc/server');
-    const rpcServer = new RPCServer(options.rpc);
+    const rpcServer = new RPCServer(options.rpc, options.rpcs, options.tendermint);
 
     const client = rpcServer.getClient();
 

@@ -9,7 +9,7 @@
 
      import('./src/index.js').then( module => {
 
-         const webclient = new WebClient('ws://' + window.location.host);
+         const webclient = new WebClient('wss://' + window.location.host);
          webclient.connect().then(async () => {
 
              window.webclient = webclient;
