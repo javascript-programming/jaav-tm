@@ -5,7 +5,7 @@
     <title>> Jaav-tm</title>
     <script src="main.js"></script>
 </head>
-<body>
+<body style="margin:50px;font-family: 'Arial Hebrew'">
 <script>
     const webclient = new WebClient('wss://' + window.location.host);
     webclient.connect().then(async () => {
@@ -23,6 +23,7 @@
         }
 
         const helloWorld = await webclient.getContract(address, accounts[0]);
+        this.window.helloWorld = helloWorld;
 
         helloWorld.onHello = (result, options) => {
             console.log(result);
@@ -31,5 +32,91 @@
         helloWorld.hello(window.location.hostname);
     });
 </script>
+<h2>Console webclient</h2>
+
+<p>Please open the Chrome (browser) console on this page! </p>
+
+<h4>Wallet functions</h4>
+
+<p> To get your accounts (at startup two accounts are provided with each 1000 coins on balance)</p>
+
+<pre><code>    &gt; let accounts = await webclient.getAccounts()</code></pre>
+
+<p> To get your balance</p>
+
+<pre><code>    &gt; await webclient.getBalance(accounts[0])</code></pre>
+
+<p> To transfer coins use <code>transfer (account, to, amount, message, password)</code></p>
+
+<pre><code>    &gt; await webclient.transfer(accounts[0], accounts[1], 1, &#39;Message for cashbook&#39;, &#39;1234&#39;);</code></pre>
+
+<p> To create a new account use <code>createAccount (password)</code></p>
+
+<pre><code>    &gt; await webclient.createAccount(&#39;1234&#39;)</code></pre>
+
+<p> To change the password of an account use <code>changePassword (account, oldPassword, newPassword)</code></p>
+
+<pre><code>    &gt; await webclient.changePassword(accounts[0], &#39;1234&#39;, &#39;newpassword&#39;)</code></pre>
+
+<h4>Contract functions</h4>
+
+<p> To get your current contracts (kept per node in a wallet file)</p>
+
+<pre><code>    &gt; await webclient.getContracts()</code></pre>
+
+<p> To compile all the modified contracts stored in the contracts folder</p>
+
+<pre><code>    &gt; await webclient.compile()</code></pre>
+
+<p> To upload a contract in the console:</p>
+
+<ul><li>Go to the snippets (tab: sources/snippets) section of the console and paste the content of a contract into the snippet area.</li><li><p>Press run (right click snippet name)</p><p>Now you will have your class available in the current scope</p></li></ul>
+
+<ul><li><p>Go to the console tab</p><pre><code>&gt; await webclient.upload(HelloWorld)</code></pre></li><li><p>To deploy a contract use <code>deploy (account, password, contract)</code></p><pre><code>&gt; let deploy = await webclient.deploy(accounts[0], &#39;1234&#39;, &#39;HelloWorld&#39;)</code></pre></li><li><p>To get an instance of the contract use <code>getContract (address, account)</code></p><pre><code>&gt; let helloWorld = await webclient.getContract(deploy.address, accounts[0])</code></pre></li><li><p>To call a contract function</p><pre><code>&gt; let result = await helloWorld.hello(&#39;world&#39;)</code></pre></li></ul>
+
+<p> For each function in the contract there is a <code>onFunctionName</code> listener available which is triggered when the function is called.</p>
+
+<pre><code>    &gt; helloWorld.onHello = (result, options) =&gt; { console.log(result) }</code></pre>
+
+<p> From wherever a function is called, each clientnode will receive a notification. In the <code>options.caller</code> the calling account is set.</p>
+
+<h3>Database access in contracts</h3>
+
+<p>On each instance of a contract a <code>database</code> property is set. This property contains functions to handle the associated contract collection.
+    For each deployed contract a database mondgodb collection is created. Contracts have read and write access to this collection. Read operation can
+    be performed on the entire database. In that case pass the address (which is the collection name) to the query function.</p>
+
+<p>As an example two functions are added to the HelloWorld contract.
+    <code></code>`
+    setData(data) {
+    return this.database.insert(data);
+    }</p>
+
+<pre><code>    getData(query) {
+        return this.database.query(query);
+    }</code></pre>
+
+<p>Functions which do database calls should return a Promise always. </p>
+
+<p>The available functions are. </p>
+
+<p>Read operation over the entire state or database</p>
+
+<ul><li>getAccount(address)</li><li>getContract(address)</li><li>query(query, collection, first = false) (collection defaults to contract address)</li></ul>
+
+<p>There are two static collections (<code>accounts</code> and <code>contracts</code>) on which can be searched on address as id. Other collections are contract addresses.</p>
+
+<ul><li>insert(record)</li><li>updateById(id, update)</li><li>update(filter, update) </li></ul>
+
+<p>These functions can only be performed on the contract collection.   </p>
+
+<p> To store data in the contract database</p>
+
+<pre><code>    &gt; await helloWorld.setData({ _id: 1, message: 'Hello world' });</code></pre>
+
+<p> To get data from the contract database</p>
+
+<pre><code>    &gt; await helloWorld.getData({ _id: 1 });</code></pre>
+
 </body>
 </html>
