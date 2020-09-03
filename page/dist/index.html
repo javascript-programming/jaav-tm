@@ -9,15 +9,26 @@
 <script>
     const webclient = new WebClient('ws://' + window.location.host);
     webclient.connect().then(async () => {
+        window.webclient = webclient;
+
         let accounts = await webclient.getAccounts();
-        console.log(accounts);
-        let balance = await webclient.getBalance(accounts[0]);
-        console.log(balance);
-        let newAccount = await webclient.createAccount('1234');
-        console.log(newAccount);
-        let transfer = await webclient.transfer(accounts[0], accounts[3], 1, 'Test', '1234').catch(err => {
-            console.log(err) });
-        console.log(transfer);
+        await webclient.compile();
+        let contracts = await webclient.getContracts();
+
+        let address = contracts.filter(item => { return item.name === 'HelloWorld' })[0].address;
+
+        if (!address) {
+            let deploy = await webclient.deploy(accounts[0], '1234', 'HelloWorld');
+            address = deploy.address;
+        }
+
+        const helloWorld = await webclient.getContract(address, accounts[0]);
+
+        helloWorld.onHello = (result, options) => {
+            console.log(result);
+        };
+
+        helloWorld.hello(window.location.hostname);
     });
 </script>
 </body>

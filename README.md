@@ -50,6 +50,8 @@ Available options
 
 Open the Chrome console on http://localhost:3000/page. If all is running correctly you will see the 'Hello localhost' message.
 
+* note: use Chrome for using the module files else use http://localhost:3000/page/dist
+
 ##### Wallet functions
 
  To get your accounts (at startup two accounts are provided with each 1000 coins on balance)
@@ -117,7 +119,7 @@ Open the Chrome console on http://localhost:3000/page. If all is running correct
 
 ![Alt text](images/call_helloworld.png?raw=true "Call and get contract")
 
-For example, a call made from node `5.157.85.181` will result on `5.157.85.76` in:
+For example, a call made from node `node1.jaav.eu` will result on `node0.jaav.eu` in:
 
 ![Alt text](images/receive_call_helloworld.png?raw=true "Receive notification from contract")
 
