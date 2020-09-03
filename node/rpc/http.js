@@ -23,6 +23,7 @@ class HttpServer {
 
         app.get('/contracts/:address/state', this.getContractState.bind(this));
 
+        app.use('/', serveStatic(path.join(__dirname, '../../page/dist')));
         app.use('/page', serveStatic(path.join(__dirname, '../../page')));
         app.use('/examples', serveStatic(path.join(__dirname, '../../examples')));
 
