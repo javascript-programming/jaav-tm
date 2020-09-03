@@ -91,7 +91,7 @@ Open the Chrome console on http://localhost:3000/page. If all is running correct
 
  Now you will have your class available in the current scope
 
-![Alt text](images/create_helloworld.png?raw=true "Create contract")
+![Alt text](page/images/create_helloworld.png?raw=true "Create contract")
 
 - Go to the console tab
 
@@ -109,7 +109,7 @@ Open the Chrome console on http://localhost:3000/page. If all is running correct
 
         > let result = await helloWorld.hello('world')
 
-![Alt text](images/deploy_helloworld.png?raw=true "Deploy contract")
+![Alt text](page/images/deploy_helloworld.png?raw=true "Deploy contract")
 
  For each function in the contract there is a `onFunctionName` listener available which is triggered when the function is called.
 
@@ -117,11 +117,11 @@ Open the Chrome console on http://localhost:3000/page. If all is running correct
 
  From wherever a function is called, each clientnode will receive a notification. In the `options.caller` the calling account is set.
 
-![Alt text](images/call_helloworld.png?raw=true "Call and get contract")
+![Alt text](page/images/call_helloworld.png?raw=true "Call and get contract")
 
 For example, a call made from node `node1.jaav.eu` will result on `node0.jaav.eu` in:
 
-![Alt text](images/receive_call_helloworld.png?raw=true "Receive notification from contract")
+![Alt text](page/images/receive_call_helloworld.png?raw=true "Receive notification from contract")
 
 ### Database access in contracts
 
@@ -158,7 +158,7 @@ There are two static collections (`accounts` and `contracts`) on which can be se
 
 These functions can only be performed on the contract collection.   
 
-![Alt text](images/setdata_helloworld.png?raw=true")
+![Alt text](page/images/setdata_helloworld.png?raw=true")
 
 ### RPC
 
