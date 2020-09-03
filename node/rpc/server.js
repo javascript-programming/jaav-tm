@@ -5,9 +5,10 @@ const HttpServer = require('./http');
 
 class RPCServer {
 
-    constructor (openPort = 3000, tendermintPort = 46657) {
+    constructor (rpcPort = 80, rpcSecurePort = 443, tendermintPort = 46657) {
         this.client = new Client(tendermintPort);
-        this.rpcPort = openPort;
+        this.rpcPort = rpcPort;
+        this.rpcSecurePort = rpcSecurePort;
         this.limit = '50mb';
     }
 
@@ -30,7 +31,7 @@ class RPCServer {
         });
 
         this.httpServer = new HttpServer(app, this.middleware);
-        this.httpServer.startServer(this.rpcPort, this.client);
+        this.httpServer.startServer(this.rpcPort, this.rpcSecurePort, this.client);
     }
 }
 

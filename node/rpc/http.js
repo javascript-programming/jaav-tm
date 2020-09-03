@@ -1,7 +1,9 @@
 const http = require('http');
+const https = require('https');
 const WebSocket = require('./websocket');
 const serveStatic = require('serve-static');
 const path = require('path');
+const fs = require('fs');
 
 class HttpServer {
 
@@ -28,18 +30,25 @@ class HttpServer {
         app.use('/examples', serveStatic(path.join(__dirname, '../../examples')));
 
         this.http = http.createServer(app);
+        this.https = https.createServer({
+            cert: fs.readFileSync(path.join(__dirname, 'cert/server.crt')),
+            key: fs.readFileSync(path.join(__dirname, 'cert/server.key'))}, app);
     }
 
     getServer () {
         return this.http;
     }
 
-    startServer (rpcPort, client) {
+    startServer (rpcPort, rpcSecurePort, client) {
 
-        this.webSocket = new WebSocket(this.http, this.middleware);
+        this.webSocket = new WebSocket(this.http, this.https, this.middleware);
 
         this.http.listen(rpcPort, () => {
             console.log('Rpc server is listening on port ' + rpcPort);
+        });
+debugger
+        this.https.listen(rpcSecurePort, () => {
+            console.log('Rpc secure server is listening on port ' + rpcSecurePort);
         });
 
         this.webSocket.openSocket(client);

@@ -3,14 +3,16 @@ const TU = require('../common/transactionutils');
 
 class WebSocket {
 
-    constructor (server, middleware) {
-        this.server = server;
+    constructor (http, https, middleware) {
+        this.http = http;
+        this.https = https;
         this.middleware = middleware;
     }
 
     openSocket (client) {
         this.client = client;
-        this.addListeners(new WS.Server({ server : this.server }), client);
+        this.addListeners(new WS.Server({ server : this.http }), client);
+        this.addListeners(new WS.Server({ server : this.https }), client);
     }
 
     addListeners (wss, client) {

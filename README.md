@@ -25,10 +25,26 @@ Install node packages and set execute permission
 
 Pass as params the configuration `single` (folder name in `configurations` folder) and rpc port `3000`. Note: `node0` and `node1` are used for a chain with two validators
 
-    ./run_node.sh single 3000 -R
+    node ./node/app.js -n single -r 3000 -s 3020 -R true
+
+Of create a startup script to use as a service
+
+    ./run_node.sh single
     
 The -R option will recreate a new chain on each startup. Set it to false (or omit it) the reuse the same chain. Mongo connection options should be passed 
 to the node else it will default all (database, user and password) to the node name.
+
+The -r and -s switches define the port numbers for the rpc server on which you can access the node. Defaults are port 80 and 443.
+
+For access over https you need to set the certificates in the `./node/rpc/cert` folder. For development you can use the following commands to
+create a local certificate:
+
+    openssl genrsa -out cert/server.key 2048
+    openssl req -new -x509 -key src/cert/server.key -out src/cert/server.crt -days 3650 -subj /CN=localhost
+
+For a self signed certificate in dev mode you might need to lighten restrictions in Chrome for localhost
+
+    chrome://flags/#allow-insecure-localhost
 
 Available options 
 
@@ -48,9 +64,9 @@ Available options
 
 ### Console webclient
 
-Open the Chrome console on http://localhost:3000/page. If all is running correctly you will see the 'Hello localhost' message.
+Open the Chrome console on http://localhost:3000/page if you want to use the module version. If all is running correctly you will see the 'Hello localhost' message.
 
-* note: use Chrome for using the module files else use http://localhost:3000/page/dist
+* note: The bundles page is found on root http://localhost:port
 
 ##### Wallet functions
 
