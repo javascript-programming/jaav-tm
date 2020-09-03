@@ -26,6 +26,7 @@
              }
 
              const helloWorld = await webclient.getContract(address, accounts[0]);
+             window.helloWorld = helloWorld;
 
              helloWorld.onHello = (result, options) => {
                  console.log(result);

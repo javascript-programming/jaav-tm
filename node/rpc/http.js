@@ -46,7 +46,7 @@ class HttpServer {
         this.http.listen(rpcPort, () => {
             console.log('Rpc server is listening on port ' + rpcPort);
         });
-debugger
+
         this.https.listen(rpcSecurePort, () => {
             console.log('Rpc secure server is listening on port ' + rpcSecurePort);
         });
