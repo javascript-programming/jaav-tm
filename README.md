@@ -68,7 +68,17 @@ Open the Chrome console on http://localhost:3000/page if you want to use the mod
 
 * note: The bundles page is found on root http://localhost:port
 
-##### Wallet functions
+
+###To see it working installed
+
+In this network two nodes are running:
+
+- node 0 https://node0.jaav.eu
+- node 1 https://jaav.eu
+
+
+
+#### Wallet functions
 
  To get your accounts (at startup two accounts are provided with each 1000 coins on balance)
 
