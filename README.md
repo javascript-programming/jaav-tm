@@ -135,10 +135,6 @@ Open the Chrome console on http://localhost:3000/page if you want to use the mod
 
 ![Alt text](page/images/call_helloworld.png?raw=true "Call and get contract")
 
-For example, a call made from node `node1.jaav.eu` will result on `node0.jaav.eu` in:
-
-![Alt text](page/images/receive_call_helloworld.png?raw=true "Receive notification from contract")
-
 ### Database access in contracts
 
 On each instance of a contract a `database` property is set. This property contains functions to handle the associated contract collection. 
