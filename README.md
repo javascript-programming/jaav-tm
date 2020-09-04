@@ -1,3 +1,33 @@
+# JAAV-TM
+
+Jaav-tm is a javascript contract engine developed by Jaav. The framework runs on a private tendermint framework which is fully scalable with as many nodes as validators or clients. 
+It can be deployed on any linux, mac or windows system.
+
+Jaav-tm supports accounts, contracts and coin management. State management is powered by MongoDB. Contracts can use MongoDB queries 
+for storage and data retrieval.
+
+Jaav-tm provides an easy way to distribute data over multiple stakeholders. 
+Data distribution is described in javascript classes. Those classes act as agreements and databases between stakeholders. States are synchronized between all nodes connected. This synchronization process will
+protect and restore data as long there are nodes alive in the network. So in case you accidentally delete your database, crash your server or chain data, the other nodes will automatically fix it for you. 
+
+### Statemanagement. 
+
+A javascript class as contract has two ways of data storage. Each class has a state object which is updated and persisted on each call on the contract. The second way of
+storage is by inserting data directly into a MondoDB collection. Each contract will have its own collection and is able to query on all collections (contracts) in the network. That means you have MongoDB's query power and specifications like for example storing GEO data. 
+Both states (collection and state) are always validated. Each node will execute the same statechange anywhere, that means you can't hack the rules of the distributed contract. 
+It is recommended to storage small pieces of data in the state object and large data object in the collections.
+
+### Events 
+
+Contracts have event listeners. In case you use a javascript contract in your web application it will get any notification from anywhere when a statechange occurred.
+The contracts can be used in any type of javascript application. The middleware, data storage and business logic is now part 
+of the Angular, React or Vue application. 
+No need to setup middleware and databases ever again it is all part of your client application. 
+Only one language to know -> javascript. Have fun!
+
+In case you want support setting up the nodes for your network, please contact at http://jaav.nl.
+  
+
 ### Install
 
 Requires MongoDb in replication mode
