@@ -66,6 +66,8 @@ to the node else it will default all (database, user and password) to the node n
 
 The -r and -s switches define the port numbers for the rpc server on which you can access the node. Defaults are port 80 and 443.
 
+#### Don't forget to set the cert folder
+
 For access over https you need to set the certificates in the `./node/rpc/cert` folder. For development you can use the following commands to
 create a local certificate:
 
@@ -76,7 +78,10 @@ For a self signed certificate in dev mode you might need to lighten restrictions
 
     chrome://flags/#allow-insecure-localhost
 
-Available options 
+- http://localhost:port points to `page/dist` where the websocket uses `wss`. You should use https/ssl here or adjust websocket host to `ws` for an insecure mode.
+- http://localhost:port/page points to `page` which runs an insecure `ws` websocket.  
+
+### Available startup options 
 
 ```
      ['t',       'tendermint=PORT'         , 'Tendermint port (default 46657)'],
@@ -84,6 +89,7 @@ Available options
      ['a',       'abci=PORT'               , 'ABCI port (default 46658)'     ],
      ['n',       'node=PATH'               , 'Node name in configurations folder'],
      ['r',       'rpc=PORT'                , 'Start rpc client and console (default 3000)'],
+     ['s',       'rpcs=PORT'               , 'Start secure rpc client and console (default 443)'],
      ['M',       'mhost=ARG'               , 'Mongodb host (default 127.0.0.1)'],
      ['P',       'mport=PORT'              , 'Mongodb port (default 27017)'],
      ['u',       'muser=ARG'               , 'Mongodb user (default node name)'],
