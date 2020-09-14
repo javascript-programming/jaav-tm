@@ -15,6 +15,7 @@ function executeContract (contract, state, fn, params, account, value) {
                 instance.caller = account;
                 instance.value = value;
                 instance.database = contract.database;
+                instance.owner = contract.owner;
 
                 const fnRef = instance[fn];
 
@@ -44,57 +45,61 @@ class ContractHandler {
 
     static deploy_contract (state, tx) {
         return new Promise(async (resolve, reject) => {
+            try {
+                const account = await state.getAccount(tx.account);
 
-            const account = await state.getAccount(tx.account);
-
-            if (!account) {
-                reject('Contract can only be deployed from valid account');
-                return;
-            }
-
-            let contract = await state.getContract(tx.to);
-
-            if (contract && contract.deployed) {
-                reject('This contract address is already deployed');
-                return;
-            }
-
-            const params = tx.params;
-
-            if (params.index === 1) {
-                contract = {
-                    _id         : tx.to,
-                    balance     : 0,
-                    owner       : tx.account,
-                    address     : tx.to,
-                    cashbook    : [],
-                    name        : tx.params.name,
-                    abi         : tx.params.abi,
-                    code        : '',
-                    deployed    : false
-                };
-            }
-
-            contract.code += params.code;
-
-            if (params.index === params.total) {
-                const Cls = CU.getClass(Buffer.from(contract.code, 'base64').toString());
-                const instance = new Cls();
-                contract.state = instance.state || {};
-                contract.deployed = true;
-            }
-
-            await state.insertRecord(contract, 'contracts');
-
-            resolve({
-                log     : 'Contract deployment',
-                result  : {
-                    address     : contract.address,
-                    abi         : contract.abi,
-                    owner       : contract.owner,
-                    deployed    : contract.deployed
+                if (!account) {
+                    reject('Contract can only be deployed from valid account');
+                    return;
                 }
-            });
+
+                let contract = await state.getContract(tx.to);
+
+                if (contract && contract.deployed) {
+                    reject('This contract address is already deployed');
+                    return;
+                }
+
+                const params = tx.params;
+
+                if (params.index === 1) {
+                    contract = {
+                        _id     : tx.to,
+                        balance : 0,
+                        owner   : tx.account,
+                        address : tx.to,
+                        cashbook: [],
+                        name    : tx.params.name,
+                        abi     : tx.params.abi,
+                        code    : '',
+                        deployed: false
+                    };
+                    await state.insertRecord(contract, 'contracts');
+                }
+
+                contract.code += params.code;
+
+                if (params.index === params.total) {
+                    const Cls = CU.getClass(Buffer.from(contract.code, 'base64').toString());
+                    const instance = new Cls();
+                    contract.state = instance.state || {};
+                    contract.deployed = true;
+                }
+
+                await state.updateRecord(tx.to, contract, 'contracts');
+
+                resolve({
+                    log   : 'Contract deployment',
+                    result: {
+                        address : contract.address,
+                        abi     : contract.abi,
+                        owner   : contract.owner,
+                        deployed: contract.deployed
+                    }
+                });
+            } catch(err) {
+                reject(err.message)
+            }
         });
     }
 
