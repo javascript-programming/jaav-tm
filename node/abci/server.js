@@ -127,11 +127,7 @@ class ABCIServer {
                         const handler = this.getHandler(transaction);
                         receipt = await handler(state, transaction, this.stateManager.chainInfo).catch(errorHandler);
 
-                        if (check) {
-                            await this.stateManager.abortTransaction(state).catch(errorHandler);
-                        } else {
-                            await this.stateManager.endTransaction(state).catch(errorHandler);
-                        }
+                        await this.stateManager.endTransaction(state).catch(errorHandler);
 
                         if (receipt.tags) {
                             tags = receipt.tags;
