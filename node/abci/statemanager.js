@@ -60,7 +60,7 @@ class StateManager {
 
             let result = {};
             result[collection] = {};
-            state.getRecord(id, collection).then(record => {
+            state.getRecord({_id: id }, collection).then(record => {
                 result[collection][id] = record;
                 for (let i = 0; i < path.length; i++) {
                     result = result[path[i]];
@@ -104,7 +104,7 @@ class StateManager {
 
             } catch (err) {
                 //this.abortTransaction(state);
-                result.log = err && err.message;
+                result.log = err;
                 resolve(result);
             }
         });
