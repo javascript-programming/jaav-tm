@@ -121,16 +121,22 @@ class ABCIServer {
                     let receipt = {};
                     let tags = [];
 
-                    if (!check) {
+                    // under consideration to remove this check condition
+                     if (!check) {
                         this.stateManager.beginTransaction(state);
                         const handler = this.getHandler(transaction);
                         receipt = await handler(state, transaction, this.stateManager.chainInfo).catch(errorHandler);
-                        await this.stateManager.endTransaction(state).catch(errorHandler);
+
+                        if (check) {
+                            await this.stateManager.abortTransaction(state).catch(errorHandler);
+                        } else {
+                            await this.stateManager.endTransaction(state).catch(errorHandler);
+                        }
 
                         if (receipt.tags) {
                             tags = receipt.tags;
                         }
-                    }
+                     }
 
                     resolve({
                         code    : 0,
