@@ -18,9 +18,14 @@ function executeContract (contract, state, fn, params, account, value) {
                 instance.owner = contract.owner;
 
                 const fnRef = instance[fn];
+                let result = fnRef.apply(instance, params);
 
+                if (result instanceof Promise) {
+                    result = await result;
+                }
+;
                 resolve({
-                    result: (fnRef instanceof Promise) ? await fnRef.apply(instance, params) : fnRef.apply(instance, params),
+                    result: result,
                     state : instance.state,
                     tags  : [
                         {key: Buffer.from('jv.contract'), value: Buffer.from(contract.address)},
@@ -32,7 +37,7 @@ function executeContract (contract, state, fn, params, account, value) {
                 reject('Function not found in contract');
             }
         } catch(err) {
-            reject(err.message);
+            reject(err.message || err);
         }
     });
 }
@@ -98,7 +103,7 @@ class ContractHandler {
                     }
                 });
             } catch(err) {
-                reject(err.message)
+                reject(err.message || err)
             }
         });
     }
@@ -133,7 +138,7 @@ class ContractHandler {
                     reject('Contract not found');
                 }
             } catch (err) {
-                reject(err.message);
+                reject(err.message || err);
             }
         });
     }
@@ -219,7 +224,7 @@ class ContractHandler {
                     result: fromContract
                 });
             } catch (err) {
-                reject(err.message);
+                reject(err.message || err);
             }
         });
     }

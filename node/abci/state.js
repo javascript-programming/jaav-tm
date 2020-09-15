@@ -65,7 +65,7 @@ class State {
             update : (filter, update) => {
                 return me.updateRecords(filter, update, contract);
             },
-        }
+        };
 
         return Object.assign(read, write ? update: {});
     }

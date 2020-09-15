@@ -122,17 +122,21 @@ class ABCIServer {
                     let tags = [];
 
                     // under consideration to remove this check condition
-                     if (!check) {
+                    //  if (!check) {
                         this.stateManager.beginTransaction(state);
                         const handler = this.getHandler(transaction);
                         receipt = await handler(state, transaction, this.stateManager.chainInfo).catch(errorHandler);
 
-                        await this.stateManager.endTransaction(state).catch(errorHandler);
+                        if (!check) {
+                            await this.stateManager.endTransaction(state).catch(errorHandler);
+                        } else {
+                            await this.stateManager.abortTransaction(state).catch(errorHandler);
+                        }
 
                         if (receipt.tags) {
                             tags = receipt.tags;
                         }
-                     }
+                     // }
 
                     resolve({
                         code    : 0,
@@ -143,7 +147,7 @@ class ABCIServer {
 
                 } catch (err) {
                     await this.stateManager.abortTransaction(state);
-                    resolve({ code: 1, log: err.message });
+                    resolve({ code: 1, log: err.message || err});
                 }
             });
         };
