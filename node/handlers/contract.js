@@ -126,6 +126,7 @@ class ContractHandler {
                     //todo check value and balance sender
                     contract.database = state.getContractDatabase(contract.address, true);
                     const result = await executeContract(contract, contract.state, tx.params.fn, tx.params.params, tx.account, tx.value);
+
                     await state.updateRecord(tx.to, { state : contract.state }, 'contracts');
 
                     resolve({
@@ -165,7 +166,7 @@ class ContractHandler {
                     reject('Contract not found');
                 }
             } catch (err) {
-                reject(err.message);
+                reject(err.message || err);
             }
         });
     }
