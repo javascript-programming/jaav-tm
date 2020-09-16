@@ -37,7 +37,7 @@ class TendermintNode {
         });
 
         node.stdout.pipe(process.stdout);
-        return node.started();
+        return node.started(20000000000);
     }
 }
 
