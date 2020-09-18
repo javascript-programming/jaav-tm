@@ -31,15 +31,27 @@ class State {
 
         me.insertRecord = me.insertRecords;
 
-        me.updateRecord = (id, update, collection) => {
+        me.updateRecord = (id, update, collection, upsert) => {
             return new Promise((resolve, reject) => {
-                mongo.database.collection(collection).updateOne({ _id : id },{ $set: update }, { session: me.session }).then(resolve).catch(reject)
+                mongo.database.collection(collection).updateOne({ _id : id },{ $set: update }, { session: me.session, upsert: upsert }).then(resolve).catch(reject)
             });
         };
 
-        me.updateRecords = async (filter, update, collection) => {
+        me.updateRecords = async (filter, update, collection, upsert) => {
             return new Promise((resolve, reject) => {
-                mongo.database.collection(collection).updateMany(filter,{ $set: update }, { session: me.session }).then(resolve).catch(reject)
+                mongo.database.collection(collection).updateMany(filter,{ $set: update }, { session: me.session, upsert: upsert }).then(resolve).catch(reject)
+            });
+        };
+
+        me.aggregate = async (pipeline, collection) => {
+            return new Promise((resolve, reject) => {
+                mongo.database.collection(collection).aggregate(pipeline).then(resolve).catch(reject)
+            });
+        };
+
+        me.count = async (query) => {
+            return new Promise((resolve, reject) => {
+                mongo.database.collection(collection).countDocuments(query).then(resolve).catch(reject)
             });
         };
 
@@ -60,6 +72,12 @@ class State {
             getContract : me.getContract,
             query : (query, fields, collection, first = false) => {
                 return me.getRecord(query, collection || contract, !first, fields);
+            },
+            count : (query, collection) => {
+                return me.count(query, collection || contract);
+            },
+            aggregate : (pipeline, collection) => {
+                return me.count(pipeline, collection || contract);
             }
         };
 
@@ -67,11 +85,11 @@ class State {
             insert : (record) => {
                 return me.insertRecords(record, contract);
             },
-            updateById : (id, update) => {
-                return me.updateRecord(id, update, contract);
+            updateById : (id, update, upsert) => {
+                return me.updateRecord(id, update, contract, upsert);
             },
-            update : (filter, update) => {
-                return me.updateRecords(filter, update, contract);
+            update : (filter, update, upsert) => {
+                return me.updateRecords(filter, update, contract, upsert);
             },
             createIndex : (field, type) => {
                 return me.createIndex(field, type, contract);
