@@ -136,7 +136,7 @@ class ABCIServer {
                         if (receipt.tags) {
                             tags = receipt.tags;
                         }
-                    }
+                    ƒ}
 
                     resolve({
                         code    : 0,
@@ -159,6 +159,8 @@ class ABCIServer {
         const commit = (request) => {
             return new Promise (async (resolve, reject) => {
                 const hash = await this.stateManager.hash;
+                console.log(request.tx);
+                console.log(hash);
                 resolve({
                     data : hash
                 });
