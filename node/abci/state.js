@@ -25,7 +25,9 @@ class State {
         me.insertRecords = (record, collection) => {
             return new Promise((resolve, reject) => {
                 const fn = Array.isArray(record) ? 'insertMany' : 'insertOne';
-                mongo.database.collection(collection)[fn](record, { session: me.session }).then(resolve).catch(reject)
+                mongo.database.collection(collection)[fn](record, { session: me.session }).then((result) => {
+                    resolve({count : result.insertedCount});
+                }).catch(reject)
             });
         };
 
@@ -33,13 +35,25 @@ class State {
 
         me.updateRecord = (id, update, collection, upsert) => {
             return new Promise((resolve, reject) => {
-                mongo.database.collection(collection).updateOne({ _id : id },{ $set: update }, { session: me.session, upsert: upsert }).then(resolve).catch(reject)
+                mongo.database.collection(collection).updateOne({ _id : id },{ $set: update }, { session: me.session, upsert: upsert }).then((result) => {
+                    resolve({
+                        upsertedCount: result.upsertedCount,
+                        matchedCount: result.matchedCount,
+                        modifiedCount: result.modifiedCount
+                    });
+                }).catch(reject)
             });
         };
 
         me.updateRecords = async (filter, update, collection, upsert) => {
             return new Promise((resolve, reject) => {
-                mongo.database.collection(collection).updateMany(filter,{ $set: update }, { session: me.session, upsert: upsert }).then(resolve).catch(reject)
+                mongo.database.collection(collection).updateMany(filter,{ $set: update }, { session: me.session, upsert: upsert }).then((result) => {
+                    resolve({
+                        upsertedCount: result.upsertedCount,
+                        matchedCount: result.matchedCount,
+                        modifiedCount: result.modifiedCount
+                    });
+                }).catch(reject)
             });
         };
 
@@ -59,7 +73,9 @@ class State {
             return new Promise((resolve, reject) => {
                 const spec = {};
                 spec[field] = type;
-                mongo.database.collection(collection).createIndex(spec, { session: me.session }).then(resolve).catch(reject)
+                mongo.database.collection(collection).createIndex(spec, { session: me.session }).then((result) => {
+                    resolve(result);
+                }).catch(reject)
             });
         }
     }
