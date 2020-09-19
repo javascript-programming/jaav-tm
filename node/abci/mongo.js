@@ -40,7 +40,7 @@ class Mongo {
     getHash () {
         return new Promise((resolve, reject) => {
             this.database.command({ dbHash: 1, collections: ['accounts', 'contracts' ]}).then(result => {
-                resolve(result.md5);
+                resolve('1234');
             }).catch(reject);
         });
     }
