@@ -6,7 +6,6 @@ class Mongo {
         this.client = new MongoClient("mongodb://" + user + ":" + encodeURIComponent(password) + "@" + host + ":" + port + "/" + database
             , { poolSize: 20,
                 useNewUrlParser: true,
-                uri_decode_auth: true,
                 useUnifiedTopology: true,
                 authSource: 'admin'
         });
