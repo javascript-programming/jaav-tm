@@ -122,7 +122,7 @@ class ABCIServer {
                     let tags = [];
 
                     // under consideration to remove this check condition
-                    //  if (!check) {
+                    if (!check) {
                         this.stateManager.beginTransaction(state);
                         const handler = this.getHandler(transaction);
                         receipt = await handler(state, transaction, this.stateManager.chainInfo).catch(errorHandler);
@@ -136,7 +136,7 @@ class ABCIServer {
                         if (receipt.tags) {
                             tags = receipt.tags;
                         }
-                     // }
+                    }
 
                     resolve({
                         code    : 0,
