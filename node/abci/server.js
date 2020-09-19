@@ -53,7 +53,7 @@ class ABCIServer {
                 data: 'Jaav contract platform',
                 version: '1.0.0',
                 lastBlockHeight:  height,
-                //lastBlockAppHash: height === 0 ? Buffer.alloc(0): this.stateManager.hash
+                lastBlockAppHash: this.stateManager.hash
             }
         };
 
