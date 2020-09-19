@@ -43,6 +43,7 @@ class StateManager {
     get hash () {
         return new Promise ((resolve, reject) => {
             this.mongo.getHash().then(hash => {
+                console.log('HASH: ' + hash);
                 resolve(TU.sha256(stringify(hash)));
             }).catch(reject);
         });

@@ -136,7 +136,7 @@ class ABCIServer {
                         if (receipt.tags) {
                             tags = receipt.tags;
                         }
-                    ƒ}
+                    }
 
                     resolve({
                         code    : 0,
@@ -161,8 +161,6 @@ class ABCIServer {
                 let hash = '';
                 try {
                     hash = await this.stateManager.hash;
-                    console.log(request.tx);
-                    console.log('HASH: ' + hash);
                 } catch(err) {
                     console.log(err.message)
                 }
