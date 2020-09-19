@@ -39,7 +39,7 @@ class Mongo {
 
     getHash () {
         return new Promise((resolve, reject) => {
-            this.database.command({ dbHash: 1 }).then(result => {
+            this.database.command({ dbHash: 1, collections: ['accounts', 'contracts' ]}).then(result => {
                 resolve(result.md5);
             }).catch(reject);
         });
