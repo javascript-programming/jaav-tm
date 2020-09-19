@@ -158,9 +158,14 @@ class ABCIServer {
     getCommitHandler () {
         const commit = (request) => {
             return new Promise (async (resolve, reject) => {
-                const hash = await this.stateManager.hash;
-                console.log(request.tx);
-                console.log(hash);
+                let hash = '';
+                try {
+                    hash = await this.stateManager.hash;
+                    console.log(request.tx);
+                    console.log('HASH: ' + hash);
+                } catch(err) {
+                    console.log(err.message)
+                }
                 resolve({
                     data : hash
                 });
