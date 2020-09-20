@@ -49,4 +49,10 @@ Main entry point is `app.js`
 - https://tendermint.readthedocs.io/en/v0.21.0/abci-spec.html
 - https://tendermint.github.io/slate/
 
+### Run on lower ports in Ubuntu
 
+- `sudo apt-get install libcap2-bin`
+- `sudo setcap cap_net_bind_service=+ep /usr/local/bin/node`
+
+
+sudo setcap cap_net_bind_service=+ep /home/jaavnl/.nvm/versions/node/v11.14.0/bin/node

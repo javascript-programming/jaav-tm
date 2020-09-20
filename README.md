@@ -38,7 +38,7 @@ To install mongodb https://docs.mongodb.com/manual/installation
 
 Due to hash comparison between databases it is preferred all nodes have the same mongodb version. Tested with MongoDb v4.4.
 
-Requires node 10+ (not tested with v11.14.0)
+Requires node 11+ (tested with v11.14.0)
 
 https://nodejs.org/en/
 
