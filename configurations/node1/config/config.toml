@@ -137,10 +137,10 @@ broadcast = true
 wal_dir = "data/mempool.wal"
 
 # size of the mempool
-size = 10000000
+size = 1000000000
 
 # size of the cache (used to filter transactions we saw earlier)
-cache_size = 10000000
+cache_size = 100000000
 
 ##### consensus configuration options #####
 [consensus]
