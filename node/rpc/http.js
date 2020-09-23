@@ -4,6 +4,7 @@ const WebSocket = require('./websocket');
 const serveStatic = require('serve-static');
 const path = require('path');
 const fs = require('fs');
+const axios = require('axios');
 
 class HttpServer {
 
@@ -11,20 +12,9 @@ class HttpServer {
 
         this.middleware = middleware;
 
-        app.get('/accounts', this.getAccounts.bind(this));
-        app.get('/accounts/:account/balance', this.getAccountBalance.bind(this));
-        app.post('/accounts/create', this.createAccount.bind(this));
-        app.post('/accounts/:account/transfer/:to', this.transfer.bind(this));
+        app.get('/proxy', this.proxy.bind(this));
 
-        app.get('/contracts', this.getContracts.bind(this));
-        app.post('/contracts/:account/deploy/:name', this.deployContract.bind(this));
-        app.get('/contracts/:address/abi', this.getAbi.bind(this));
-        app.get('/contracts/:address/code', this.getCode.bind(this));
-        app.post('/contracts/:address/:account/:method/call', this.callContract.bind(this));
-        app.post('/contracts/:address/:account/:method/get', this.queryContract.bind(this));
-
-        app.get('/contracts/:address/state', this.getContractState.bind(this));
-
+        //static base path should be passed with options
         app.use('/', serveStatic(path.join(__dirname, '../../page/dist')));
         app.use('/page', serveStatic(path.join(__dirname, '../../page')));
         app.use('/examples', serveStatic(path.join(__dirname, '../../examples')));
@@ -202,6 +192,17 @@ class HttpServer {
             result  : result || 'Not found'
         });
     }
+
+    proxy (req, res) {
+
+        const url = req.query.url;
+        delete req.query.url;
+
+        axios.get(url, { params: req.query}).then(result =>{
+            res.json(result.data);
+        });
+    }
+
 }
 
 module.exports = HttpServer;

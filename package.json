@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "dependencies": {
     "abci": "^4.0.0",
+    "axios": "^0.20.0",
     "body-parser": "^1.18.3",
     "bs58check": "^2.1.2",
     "crypto": "^1.0.1",

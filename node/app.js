@@ -4,6 +4,12 @@ const Mongo = require('./abci/mongo');
 const commands = new Commands();
 const options = commands.getOptions().options;
 
+process.on('unhandledRejection', (error, promise) => {
+    console.log(' We forgot to handle a promise rejection here: ', promise);
+    console.log(' The error was: ', error );
+});
+
+
 if (options.node) {
     const AbciServer = require('./abci/server');
     const TendermintNode = require('./node/server');
@@ -35,6 +41,7 @@ if (options.node) {
     abciServer.start(options.abci);
 
     tendermintNode.start().then(() => {
+
         if (options.rpc) {
             startRpc();
         }
