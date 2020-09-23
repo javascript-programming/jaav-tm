@@ -57,6 +57,18 @@ class State {
             });
         };
 
+        me.bulkWrite = async (operations, collection) => {
+            return new Promise((resolve, reject) => {
+                mongo.database.collection(collection).bulkWrite(operations, {session: me.session}).then(result => {
+                    resolve({
+                        upsertedCount: result.upsertedCount,
+                        matchedCount : result.matchedCount,
+                        modifiedCount: result.modifiedCount
+                    });
+                }).catch(reject);
+            });
+        };
+
         me.aggregate = async (pipeline, collection) => {
             return new Promise((resolve, reject) => {
                 mongo.database.collection(collection).aggregate(pipeline).then(resolve).catch(reject)
@@ -106,6 +118,12 @@ class State {
             },
             update : (filter, update, upsert) => {
                 return me.updateRecords(filter, update, contract, upsert);
+            },
+            updates : (operations = [], upsert = false) => {
+                operations = operations.map(operation => {
+                    return { updateOne: { filter: operation.filter, update: {$set: operation.update}, upsert: upsert } }
+                });
+                return me.bulkWrite(operations, contract);
             },
             createIndex : (field, type) => {
                 return me.createIndex(field, type, contract);
