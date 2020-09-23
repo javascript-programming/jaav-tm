@@ -67,7 +67,7 @@ class RPCClient {
         });
     }
 
-    send (tx, commit) {
+    send (tx, commit = true) {
 
         return new Promise((resolve, reject) => {
 
