@@ -15,7 +15,7 @@ class ABCIServer {
         const packageDefinition = protoLoader.loadSync(
             this.PROTO_PATH,
             {
-                keepCase: true,
+                keepCase: false,
                 longs: String,
                 enums: String,
                 defaults: true,
@@ -62,48 +62,50 @@ class ABCIServer {
     }
 
     getQueryHander () {
-        const query = (request) => {
-            return this.stateManager.query(request);
+        const Query = (request, callback) => {
+            this.stateManager.query(request).then(response => {
+                callback(null, response);
+            });
         };
 
-        return { query }
+        return { Query }
     }
 
     SetOption ()  {
-        const SetOption = () => {
-
+        const SetOption = (request, callback) => {
+            callback(null, callback);
         };
 
         return { SetOption }
     }
 
     ListSnapshots ()  {
-        const ListSnapshots = () => {
-
+        const ListSnapshots = (request, callback) => {
+            callback(null, {});
         };
 
         return { ListSnapshots }
     }
 
     OfferSnapshot ()  {
-        const OfferSnapshot = () => {
-
+        const OfferSnapshot = (request, callback) => {
+            callback(null, {});
         };
 
         return { OfferSnapshot }
     }
 
-    LoadSnapshotChunk ()  {
+    LoadSnapshotChunk (request, callback)  {
         const LoadSnapshotChunk = () => {
-
+            callback(null, {});
         };
 
         return { LoadSnapshotChunk }
     }
 
     ApplySnapshotChunk ()  {
-        const ApplySnapshotChunk = () => {
-
+        const ApplySnapshotChunk = (request, callback) => {
+            callback(null, {});
         };
 
         return { ApplySnapshotChunk }
@@ -111,62 +113,67 @@ class ABCIServer {
 
     getInfoHandler () {
 
-        const Info = (request) => {
+        const Info = (call, callback) => {
 
             const height = this.stateManager.chainInfo.height;
-
-            return {
-                data: 'Jaav contract platform',
-                version: '1.0.0',
-                lastBlockHeight:  height,
-                lastBlockAppHash: this.stateManager.hash
-            }
+            this.stateManager.hash.then(hash => {
+                callback(null, {
+                    data: 'Jaav contract platform',
+                    version: '1.0.0',
+                    lastBlockHeight : height
+                    // lastBlockAppHash : heigth hash
+                });
+            });
         };
 
         return { Info }
     }
 
     getFlushHandler () {
-        const Flush = (request) => {
-            return {}
+        const Flush = (call, callback) => {
+            callback(null, {});
         };
 
         return { Flush }
     }
 
     getEchoHandler () {
-        const Echo = function (request, callback) {
-            callback(null, {message: 'Hello Terence'});
+        const Echo = function (call, callback) {
+            callback(null, {message: ''});
         };
 
         return { Echo }
     }
 
     getBeginBlockHandler () {
-        const BeginBlock = (request) => {
-            return {
+        const BeginBlock = (call, callback) => {
+            callback(null, {
                 tags : []
-            }
+            });
         };
 
         return { BeginBlock }
     }
 
     getEndBlockHandler () {
-        const EndBlock = (request) => {
-            this.stateManager.chainInfo.height = request.height.toNumber();
-            return {
+        const EndBlock = (call, callback) => {
+            this.stateManager.chainInfo.height = parseInt(call.request.height);
+
+            callback(null, {
                 tags : []
-            }
+            });
         };
 
         return { EndBlock }
     }
 
     getInitChainHandler () {
-        const InitChain = ({ validators }) => {
-            this.stateManager.chainInfo.validators = validators;
-            return {};
+        const InitChain = (call, callback) => {
+            this.stateManager.chainInfo.validators = call.request.validators;
+            callback(null, {
+                consensusParams : call.request.consensusParams,
+                validators: call.request.validators
+            });
         };
 
         return { InitChain }
@@ -175,62 +182,70 @@ class ABCIServer {
 
     getCheckTxHandler () {
 
-        const CheckTx = (request) => {
-            return this.getDeliveryTxHandler().deliverTx(request, true);
+        const CheckTx = (call, callback) => {
+            this.deliverTx(call.request, true).then(response => {
+                callback(null, response)
+            });
         };
 
         return { CheckTx }
     }
 
-    getDeliveryTxHandler () {
+    deliverTx (request, check) {
 
-        const DeliverTx = (request, check) => {
+        return new Promise(async (resolve, reject) => {
 
-            return new Promise(async (resolve, reject) => {
+            const state = this.stateManager.state;
 
-                const state = this.stateManager.state;
+            const errorHandler = (err) => {
+                throw new Error(err.message || err);
+            };
 
-                const errorHandler = (err) => {
-                    throw new Error(err.message || err);
-                };
+            try {
+                const transaction = this.getTransaction(request);
 
-                try {
-                    const transaction = this.getTransaction(request);
+                if (!TU.verifyTx(transaction))
+                    throw new Error('Signature not valid');
 
-                    if (!TU.verifyTx(transaction))
-                        throw new Error('Signature not valid');
+                let receipt = {};
+                let tags = [];
 
-                    let receipt = {};
-                    let tags = [];
+                // under consideration to remove this check condition
+                if (!check) {
+                    this.stateManager.beginTransaction(state);
+                    const handler = this.getHandler(transaction);
+                    receipt = await handler(state, transaction, this.stateManager.chainInfo).catch(errorHandler);
 
-                    // under consideration to remove this check condition
                     if (!check) {
-                        this.stateManager.beginTransaction(state);
-                        const handler = this.getHandler(transaction);
-                        receipt = await handler(state, transaction, this.stateManager.chainInfo).catch(errorHandler);
-
-                        if (!check) {
-                            await this.stateManager.endTransaction(state).catch(errorHandler);
-                        } else {
-                            await this.stateManager.abortTransaction(state).catch(errorHandler);
-                        }
-
-                        if (receipt.tags) {
-                            tags = receipt.tags;
-                        }
+                        await this.stateManager.endTransaction(state).catch(errorHandler);
+                    } else {
+                        await this.stateManager.abortTransaction(state).catch(errorHandler);
                     }
 
-                    resolve({
-                        code    : 0,
-                        log     : receipt.log || 'tx succeeded',
-                        tags    : tags,
-                        data    : Buffer.from(stringify(receipt.result || {}))
-                    });
-
-                } catch (err) {
-                    await this.stateManager.abortTransaction(state);
-                    resolve({ code: 1, log: err.message || err});
+                    if (receipt.tags) {
+                        tags = receipt.tags;
+                    }
                 }
+
+                resolve({
+                    code: 0,
+                    log : receipt.log || 'tx succeeded',
+                    tags: tags,
+                    data: Buffer.from(stringify(receipt.result || {}))
+                });
+
+            } catch (err) {
+                await this.stateManager.abortTransaction(state);
+                resolve({code: 1, log: err.message || err});
+            }
+        });
+    }
+
+    getDeliveryTxHandler () {
+
+        const DeliverTx = (call, callback) => {
+            this.deliverTx(call.request).then(response => {
+                callback(null, response)
             });
         };
 
@@ -238,19 +253,12 @@ class ABCIServer {
     }
 
     getCommitHandler () {
-        const Commit = (request) => {
-            return new Promise (async (resolve, reject) => {
-                let hash = '';
-                try {
-                    hash = await this.stateManager.hash;
-                } catch(err) {
-                    console.log(err.message);
-                    reject();
-                }
-                resolve({
+        const Commit = (call, callback) => {
+            let hash = '';
+            this.stateManager.hash.then(hash);
+                callback(null, {
                     data : hash
                 });
-            });
         };
 
         return { Commit }
