@@ -1,39 +1,39 @@
 {
-  "genesis_time": "2020-09-24T13:12:49.662269501Z",
-  "chain_id": "chain-jlfrPa",
+  "genesis_time": "2020-09-26T15:54:45.120964Z",
+  "chain_id": "chain-Lp69jG",
   "validators": [
     {
-      "address": "3DD74982412E848B99A9628C12CD72BED8043ED2",
+      "address": "263994F7240846CA2121DD96457CC8D3CA55705F",
       "pub_key": {
         "type": "tendermint/PubKeyEd25519",
-        "value": "xJ00wwgczoHoeUKrnwKWKlIT7RJ9LqlVPUMX6CZEg2Q="
+        "value": "Z0NYIftK9L0JWG5ceumyCMg/hSF2GusyjAJ/NVf1bB0="
       },
       "power": "1",
       "name": "node0"
     },
     {
-      "address": "F8B0D4D658A772FC25B7997EBA3BBF4F1620EFCF",
+      "address": "BF783C66484E25FB33CCFA329C6B90661FE7DAA4",
       "pub_key": {
         "type": "tendermint/PubKeyEd25519",
-        "value": "zxiQcBa8dPCWb4W8rP/j3alglBtGR5v4GcY8fd8CFh4="
+        "value": "eUX0jzf2xfImCU/YMGofFpqAV/l4a7baT4m4hIOGvw0="
       },
       "power": "1",
       "name": "node1"
     },
     {
-      "address": "ECBF9C9270D04606DB7E4FFF80DA05DA6F8033C9",
+      "address": "4D90C0853D0DB2D9037955E915FBE0105880E858",
       "pub_key": {
         "type": "tendermint/PubKeyEd25519",
-        "value": "I8RRhsyx85qFr813DFiMlzHqzJ04JwfTGFQmqkrk8No="
+        "value": "EOhmA6kQ2AtWApf50hplKU5D0P8/rfvovCEZc3cq1pg="
       },
       "power": "1",
       "name": "node2"
     },
     {
-      "address": "4DD92FE63B43A6FE7A3615DB6D7492A727B9C3CD",
+      "address": "2A7AB0495AF7D2087ED4FED97A1AF9DA3E3ED462",
       "pub_key": {
         "type": "tendermint/PubKeyEd25519",
-        "value": "3uG3eM8htjWqWEcDFZAaQStjIuzDy9H4MqRAXwlrkIY="
+        "value": "6j2+VTKbyb9V5pBc8A3sxXdHFJG8NSx6ydlxsWBX+JA="
       },
       "power": "1",
       "name": "node3"

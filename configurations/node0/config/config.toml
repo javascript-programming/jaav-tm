@@ -24,13 +24,19 @@ db_dir = "data"
 # Output level for logging, including package level options
 log_level = "main:info,state:info,*:error"
 
+# Output format: 'plain' (colored text) or 'json'
+log_format = "plain"
+
 ##### additional base config options #####
 
 # Path to the JSON file containing the initial validator set and other meta data
 genesis_file = "config/genesis.json"
 
 # Path to the JSON file containing the private key to use as a validator in the consensus protocol
-priv_validator_file = "config/priv_validator.json"
+priv_validator_key_file = "config/priv_validator_key.json"
+
+# Path to the JSON file containing the last sign state of a validator
+priv_validator_state_file = "data/priv_validator_state.json"
 
 # TCP or UNIX socket address for Tendermint to listen on for
 # connections from an external PrivValidator process
@@ -40,7 +46,7 @@ priv_validator_laddr = ""
 node_key_file = "config/node_key.json"
 
 # Mechanism to connect to the ABCI application: socket | grpc
-abci = "socket"
+abci = "grpc"
 
 # TCP or UNIX socket address for the profiling server to listen on
 prof_laddr = ""
@@ -57,13 +63,24 @@ filter_peers = false
 # TCP or UNIX socket address for the RPC server to listen on
 laddr = "tcp://0.0.0.0:26657"
 
+# A list of origins a cross-domain request can be executed from
+# Default value '[]' disables cors support
+# Use '["*"]' to allow any origin
+cors_allowed_origins = []
+
+# A list of methods the client is allowed to use with cross-domain requests
+cors_allowed_methods = ["HEAD", "GET", "POST", ]
+
+# A list of non simple headers the client is allowed to use with cross-domain requests
+cors_allowed_headers = ["Origin", "Accept", "Content-Type", "X-Requested-With", "X-Server-Time", ]
+
 # TCP or UNIX socket address for the gRPC server to listen on
 # NOTE: This server only supports /broadcast_tx_commit
 grpc_laddr = ""
 
 # Maximum number of simultaneous connections.
 # Does not include RPC (HTTP&WebSocket) connections. See max_open_connections
-# If you want to accept more significant number than the default, make sure
+# If you want to accept a larger number than the default, make sure
 # you increase your OS limits.
 # 0 - unlimited.
 # Should be < {ulimit -Sn} - {MaxNumInboundPeers} - {MaxNumOutboundPeers} - {N of wal, db and other open files}
@@ -75,12 +92,39 @@ unsafe = false
 
 # Maximum number of simultaneous connections (including WebSocket).
 # Does not include gRPC connections. See grpc_max_open_connections
-# If you want to accept more significant number than the default, make sure
+# If you want to accept a larger number than the default, make sure
 # you increase your OS limits.
 # 0 - unlimited.
 # Should be < {ulimit -Sn} - {MaxNumInboundPeers} - {MaxNumOutboundPeers} - {N of wal, db and other open files}
 # 1024 - 40 - 10 - 50 = 924 = ~900
 max_open_connections = 900
+
+# Maximum number of unique clientIDs that can /subscribe
+# If you're using /broadcast_tx_commit, set to the estimated maximum number
+# of broadcast_tx_commit calls per block.
+max_subscription_clients = 100
+
+# Maximum number of unique queries a given client can /subscribe to
+# If you're using GRPC (or Local RPC client) and /broadcast_tx_commit, set to
+# the estimated # maximum number of broadcast_tx_commit calls per block.
+max_subscriptions_per_client = 5
+
+# How long to wait for a tx to be committed during /broadcast_tx_commit.
+# WARNING: Using a value larger than 10s will result in increasing the
+# global HTTP write timeout, which applies to all connections and endpoints.
+# See https://github.com/tendermint/tendermint/issues/3435
+timeout_broadcast_tx_commit = "10s"
+
+# The name of a file containing certificate that is used to create the HTTPS server.
+# If the certificate is signed by a certificate authority,
+# the certFile should be the concatenation of the server's certificate, any intermediates,
+# and the CA's certificate.
+# NOTE: both tls_cert_file and tls_key_file must be present for Tendermint to create HTTPS server. Otherwise, HTTP server is run.
+tls_cert_file = ""
+
+# The name of a file containing matching private key that is used to create the HTTPS server.
+# NOTE: both tls_cert_file and tls_key_file must be present for Tendermint to create HTTPS server. Otherwise, HTTP server is run.
+tls_key_file = ""
 
 ##### peer to peer configuration options #####
 [p2p]
@@ -98,7 +142,7 @@ external_address = ""
 seeds = ""
 
 # Comma separated list of nodes to keep persistent connections to
-persistent_peers = "c47a2f735fd76712256cc4b2e7c1cfd25036f7aa@node0:26656,de16142fb3d5a68259097372548751e90129b874@node1:26656,1719be3dde394153d20f0a7d0f2adc14cbdbc90c@node2:26656,e3e0a83472b12b4671016a3e0174fcada4163105@node3:26656"
+persistent_peers = "18a3055a2bc0a456975d4cce324c28eb94c2e5bf@node0.jaav.eu:26656,25b436522fef732c97881fadfa2666b3fd6d20c5@jaav.eu:26656"
 
 # UPNP port forwarding
 upnp = false
@@ -110,17 +154,17 @@ addr_book_file = "config/addrbook.json"
 # Set false for private or local networks
 addr_book_strict = false
 
-# Time to wait before flushing messages out on the connection, in ms
-flush_throttle_timeout = 100
-
 # Maximum number of inbound peers
 max_num_inbound_peers = 40
 
 # Maximum number of outbound peers to connect to, excluding persistent peers
 max_num_outbound_peers = 10
 
+# Time to wait before flushing messages out on the connection
+flush_throttle_timeout = "100ms"
+
 # Maximum size of a message packet payload, in bytes
-max_packet_msg_payload_size = 1024
+max_packet_msg_payload_size = 1024000
 
 # Rate at which packets can be sent, in bytes/second
 send_rate = 5120000
@@ -140,18 +184,29 @@ seed_mode = false
 # Comma separated list of peer IDs to keep private (will not be gossiped to other peers)
 private_peer_ids = ""
 
+# Toggle to disable guard against peers connecting from the same ip.
+allow_duplicate_ip = true
+
+# Peer connection configuration.
+handshake_timeout = "20s"
+dial_timeout = "3s"
+
 ##### mempool configuration options #####
 [mempool]
 
 recheck = true
-recheck_empty = true
 broadcast = true
-wal_dir = "data/mempool.wal"
+wal_dir = ""
 
-# size of the mempool
+# Maximum number of transactions in the mempool
 size = 5000
 
-# size of the cache (used to filter transactions we saw earlier)
+# Limit the total size of all txs in the mempool.
+# This only accounts for raw transactions (e.g. given 1MB transactions and
+# max_txs_bytes=5MB, mempool will only accept 5 transactions).
+max_txs_bytes = 1073741824
+
+# Size of the cache (used to filter transactions we saw earlier) in transactions
 cache_size = 10000
 
 ##### consensus configuration options #####
@@ -159,25 +214,24 @@ cache_size = 10000
 
 wal_file = "data/cs.wal/wal"
 
-# All timeouts are in milliseconds
-timeout_propose = 3000
-timeout_propose_delta = 500
-timeout_prevote = 1000
-timeout_prevote_delta = 500
-timeout_precommit = 1000
-timeout_precommit_delta = 500
-timeout_commit = 1000
+timeout_propose = "3s"
+timeout_propose_delta = "500ms"
+timeout_prevote = "1s"
+timeout_prevote_delta = "500ms"
+timeout_precommit = "1s"
+timeout_precommit_delta = "500ms"
+timeout_commit = "1s"
 
 # Make progress as soon as we have all the precommits (as if TimeoutCommit = 0)
 skip_timeout_commit = false
 
-# EmptyBlocks mode and possible interval between empty blocks in seconds
+# EmptyBlocks mode and possible interval between empty blocks
 create_empty_blocks = true
-create_empty_blocks_interval = 0
+create_empty_blocks_interval = "0s"
 
-# Reactor sleep duration parameters are in milliseconds
-peer_gossip_sleep_duration = 100
-peer_query_maj23_sleep_duration = 2000
+# Reactor sleep duration parameters
+peer_gossip_sleep_duration = "100ms"
+peer_query_maj23_sleep_duration = "2s"
 
 ##### transactions indexer configuration options #####
 [tx_index]
@@ -185,8 +239,8 @@ peer_query_maj23_sleep_duration = 2000
 # What indexer to use for transactions
 #
 # Options:
-#   1) "null" (default)
-#   2) "kv" - the simplest possible indexer, backed by key-value storage (defaults to levelDB; see DBBackend).
+#   1) "null"
+#   2) "kv" (default) - the simplest possible indexer, backed by key-value storage (defaults to levelDB; see DBBackend).
 indexer = "kv"
 
 # Comma-separated list of tags to index (by default the only tag is "tx.hash")
@@ -218,7 +272,10 @@ prometheus = false
 prometheus_listen_addr = ":26660"
 
 # Maximum number of simultaneous connections.
-# If you want to accept more significant number than the default, make sure
+# If you want to accept a larger number than the default, make sure
 # you increase your OS limits.
 # 0 - unlimited.
 max_open_connections = 3
+
+# Instrumentation namespace
+namespace = "tendermint"
