@@ -79,7 +79,12 @@ class ContractHandler {
                         code    : '',
                         deployed: false
                     };
-                    await state.insertRecord(contract, 'contracts');
+
+                    try {
+                        await state.insertRecord(contract, 'contracts');
+                    } catch (ee) {
+                        // debugger
+                    }
                 }
 
                 contract.code += params.code;

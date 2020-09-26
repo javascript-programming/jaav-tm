@@ -105,7 +105,7 @@ class RPCClient {
                     resolve(result);
                 },
                 reject : (data) => {
-                    reject(data.result.response.log);
+                    reject(data.result && data.result.response.log);
                 }
             };
             this.ws.send(stringify(call));
@@ -119,7 +119,7 @@ class RPCClient {
 
         if (transaction) {
 
-            if (data.result.deliver_tx) {
+            if (data.result && data.result.deliver_tx) {
                 const code = data.result.check_tx.code || 0;
 
                 if (code === 0) {
