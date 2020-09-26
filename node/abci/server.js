@@ -62,8 +62,8 @@ class ABCIServer {
     }
 
     getQueryHander () {
-        const Query = (request, callback) => {
-            this.stateManager.query(request).then(response => {
+        const Query = (call, callback) => {
+            this.stateManager.query(call.request).then(response => {
                 callback(null, response);
             });
         };
