@@ -10,44 +10,6 @@ process.on('unhandledRejection', (error, promise) => {
 });
 
 
-if (options.node) {
-    const AbciServer = require('./abci/server');
-    const TendermintNode = require('./node/server');
-
-    const abciServer = new AbciServer(new Mongo(
-        options.mhost, options.mport,
-        options.muser || options.node,
-        options.mpassword || options.node,
-        options.mdatabase || options.node
-    ));
-
-    const WalletHandler = require('./handlers/wallet');
-    abciServer.use(WalletHandler);
-
-    const ContractHandler = require('./handlers/contract');
-    abciServer.use(ContractHandler);
-
-    switch (options.rebuild) {
-        case "0":
-        case "false":
-            options.rebuild = false;
-            break;
-        default:
-            options.rebuild = true;
-    }
-
-    const tendermintNode = new TendermintNode(options.home, options.node, options.tendermint, options.abci, options.rebuild);
-
-    abciServer.start(options.abci);
-
-    tendermintNode.start().then(() => {
-
-        if (options.rpc) {
-            startRpc();
-        }
-    })
-}
-
 const startRpc = () => {
 
     const RPCServer = require('./rpc/server');
@@ -70,6 +32,49 @@ const startRpc = () => {
         rpcServer.startServer(console.getFunctions());
     }).catch(err => console.log(err));
 };
+
+const startABCI = () => {
+    const AbciServer = require('./abci/server');
+
+    const abciServer = new AbciServer(new Mongo(
+        options.mhost, options.mport,
+        options.muser || options.node,
+        options.mpassword || options.node,
+        options.mdatabase || options.node
+    ));
+
+    const WalletHandler = require('./handlers/wallet');
+    abciServer.use(WalletHandler);
+
+    const ContractHandler = require('./handlers/contract');
+    abciServer.use(ContractHandler);
+    abciServer.start(options.abci);
+};
+
+
+if (options.node) {
+    const TendermintNode = require('./node/server');
+
+    switch (options.rebuild) {
+        case "0":
+        case "false":
+            options.rebuild = false;
+            break;
+        default:
+            options.rebuild = true;
+    }
+
+    startABCI();
+
+    const tendermintNode = new TendermintNode(options.home, options.node, options.tendermint, options.abci, options.rebuild);
+
+    tendermintNode.start().then(() => {
+
+        if (options.rpc) {
+            startRpc();
+        }
+    })
+}
 
 if (!options.node && options.rpc) {
     startRpc();

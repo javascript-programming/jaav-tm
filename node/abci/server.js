@@ -1,4 +1,5 @@
-const server = require('abci');
+const grpc = require('grpc');
+const protoLoader = require('@grpc/proto-loader');
 const TU = require('../common/transactionutils');
 const stringify = require('json-stable-stringify');
 const StateManager = require('./statemanager');
@@ -9,22 +10,47 @@ class ABCIServer {
 
         this.stateManager = new StateManager(mongo);
 
+        this.PROTO_PATH = __dirname + '/proto/types.proto';
+
+        const packageDefinition = protoLoader.loadSync(
+            this.PROTO_PATH,
+            {
+                keepCase: true,
+                longs: String,
+                enums: String,
+                defaults: true,
+                oneofs: true,
+                includeDirs: [__dirname + '/proto']
+            });
+
+        this.abciProto = grpc.loadPackageDefinition(packageDefinition).types.ABCIApplication;
+
         this.stateManager.chainInfo = {
             height : 0
         };
 
         this.handlers = {};
 
-        let coreHandlers = Object.assign.call({},
+        this.handlers = Object.assign.call({},
             this.getInitChainHandler(),
+            this.getFlushHandler(),
+            this.getEchoHandler(),
             this.getQueryHander(),
             this.getInfoHandler(),
             this.getBeginBlockHandler(),
             this.getEndBlockHandler(),
             this.getCheckTxHandler(),
             this.getDeliveryTxHandler(),
-            this.getCommitHandler());
-            this.server = server(coreHandlers);
+            this.getCommitHandler(),
+            this.SetOption(),
+            this.ListSnapshots(),
+            this.OfferSnapshot(),
+            this.LoadSnapshotChunk(),
+            this.ApplySnapshotChunk()
+            );
+
+        this.server = new grpc.Server();
+        this.server.addService(this.abciProto.service, this.handlers);
     }
 
     use (handler) {
@@ -43,9 +69,49 @@ class ABCIServer {
         return { query }
     }
 
+    SetOption ()  {
+        const SetOption = () => {
+
+        };
+
+        return { SetOption }
+    }
+
+    ListSnapshots ()  {
+        const ListSnapshots = () => {
+
+        };
+
+        return { ListSnapshots }
+    }
+
+    OfferSnapshot ()  {
+        const OfferSnapshot = () => {
+
+        };
+
+        return { OfferSnapshot }
+    }
+
+    LoadSnapshotChunk ()  {
+        const LoadSnapshotChunk = () => {
+
+        };
+
+        return { LoadSnapshotChunk }
+    }
+
+    ApplySnapshotChunk ()  {
+        const ApplySnapshotChunk = () => {
+
+        };
+
+        return { ApplySnapshotChunk }
+    }
+
     getInfoHandler () {
 
-        const info = (request) => {
+        const Info = (request) => {
 
             const height = this.stateManager.chainInfo.height;
 
@@ -57,52 +123,68 @@ class ABCIServer {
             }
         };
 
-        return { info }
+        return { Info }
+    }
+
+    getFlushHandler () {
+        const Flush = (request) => {
+            return {}
+        };
+
+        return { Flush }
+    }
+
+    getEchoHandler () {
+        const Echo = function (request, callback) {
+            callback(null, {message: 'Hello Terence'});
+        };
+
+        return { Echo }
     }
 
     getBeginBlockHandler () {
-        const beginBlock = (request) => {
+        const BeginBlock = (request) => {
             return {
                 tags : []
             }
         };
 
-        return { beginBlock }
+        return { BeginBlock }
     }
 
     getEndBlockHandler () {
-        const endBlock = (request) => {
+        const EndBlock = (request) => {
             this.stateManager.chainInfo.height = request.height.toNumber();
             return {
                 tags : []
             }
         };
 
-        return { endBlock }
+        return { EndBlock }
     }
 
     getInitChainHandler () {
-        const initChain = ({ validators }) => {
+        const InitChain = ({ validators }) => {
             this.stateManager.chainInfo.validators = validators;
             return {};
         };
 
-        return { initChain }
+        return { InitChain }
     }
 
 
     getCheckTxHandler () {
 
-        const checkTx = (request) => {
+        const CheckTx = (request) => {
             return this.getDeliveryTxHandler().deliverTx(request, true);
         };
 
-        return { checkTx }
+        return { CheckTx }
     }
 
     getDeliveryTxHandler () {
 
-        const deliverTx = (request, check) => {
+        const DeliverTx = (request, check) => {
 
             return new Promise(async (resolve, reject) => {
 
@@ -152,17 +234,18 @@ class ABCIServer {
             });
         };
 
-        return { deliverTx }
+        return { DeliverTx }
     }
 
     getCommitHandler () {
-        const commit = (request) => {
+        const Commit = (request) => {
             return new Promise (async (resolve, reject) => {
                 let hash = '';
                 try {
                     hash = await this.stateManager.hash;
                 } catch(err) {
-                    console.log(err.message)
+                    console.log(err.message);
+                    reject();
                 }
                 resolve({
                     data : hash
@@ -170,7 +253,7 @@ class ABCIServer {
             });
         };
 
-        return { commit }
+        return { Commit }
     }
 
     getHandler(tx) {
@@ -185,7 +268,8 @@ class ABCIServer {
 
     start (port = 46658) {
         this.stateManager.connect().then(()=> {
-            this.server.listen(port);
+            this.server.bind('0.0.0.0:' + port, grpc.ServerCredentials.createInsecure());
+            this.server.start();
         });
 
     }

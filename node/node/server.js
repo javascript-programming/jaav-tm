@@ -12,9 +12,11 @@ class TendermintNode {
 
         if (rebuild || !Utils.exists(this.home)) {
             if (config) {
-                config = path.join(__dirname, '../../configurations', path.join(config, 'config'));
+                const configDir = path.join(__dirname, '../../configurations', path.join(config, 'config'));
+                const dataDir = path.join(__dirname, '../../configurations', path.join(config, 'data'));
                 Utils.removePath(this.home);
-                Utils.copyDir(config, path.join(this.home, 'config'));
+                Utils.copyDir(configDir, path.join(this.home, 'config'));
+                Utils.copyDir(dataDir, path.join(this.home, 'data'));
 
             } else {
                 Utils.makeDirWhenNotExists(this.home);
