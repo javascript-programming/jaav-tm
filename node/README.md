@@ -53,6 +53,3 @@ Main entry point is `app.js`
 
 - `sudo apt-get install libcap2-bin`
 - `sudo setcap cap_net_bind_service=+ep /usr/local/bin/node`
-
-
-sudo setcap cap_net_bind_service=+ep /home/jaavnl/.nvm/versions/node/v11.14.0/bin/node

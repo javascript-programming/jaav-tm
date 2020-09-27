@@ -38,7 +38,25 @@ To install mongodb https://docs.mongodb.com/manual/installation
 
 Due to hash comparison between databases it is preferred all nodes have the same mongodb version. Tested with MongoDb v4.4.
 
-Requires node 11+ (tested with v11.14.0)
+The database needs to be set a a replica set. 
+https://docs.mongodb.com/manual/tutorial/convert-standalone-to-replica-set
+
+Add the user in the admin database
+
+```
+use admin
+db.createUser(
+  {
+    user: "node0",
+    pwd: "node0",
+    roles: [
+       { role: "readWrite", db: "node0" }
+    ]
+  }
+)
+```
+
+Requires node 11+
 
 https://nodejs.org/en/
 
@@ -59,7 +77,7 @@ Pass as params the configuration `single` (folder name in `configurations` folde
 
 Of create a startup script to use as a service
 
-    ./run_node.sh single
+    ./run_node.sh
     
 The -R option will recreate a new chain on each startup. Set it to false (or omit it) the reuse the same chain. Mongo connection options should be passed 
 to the node else it will default all (database, user and password) to the node name.
