@@ -35,11 +35,9 @@ Requires MongoDb in replication mode
 *update The statemanager in storing its state in a mongo database. 
 
 To install mongodb https://docs.mongodb.com/manual/installation
+https://docs.mongodb.com/manual/tutorial/convert-standalone-to-replica-set
 
 Due to hash comparison between databases it is preferred all nodes have the same mongodb version. Tested with MongoDb v4.4.
-
-The database needs to be set a a replica set. 
-https://docs.mongodb.com/manual/tutorial/convert-standalone-to-replica-set
 
 Add the user in the admin database
 
@@ -118,7 +116,7 @@ For a self signed certificate in dev mode you might need to lighten restrictions
 
 ### Console webclient
 
-Open the Chrome console on http://localhost:3000/page if you want to use the module version. If all is running correctly you will see the 'Hello localhost' message.
+Open the Chrome console on http://localhost:port/page if you want to use the module version. If all is running correctly you will see the 'Hello localhost' message.
 
 * note: The bundles page is found on root http://localhost:port
 
