@@ -127,8 +127,8 @@ Open the Chrome console on http://localhost:3000/page if you want to use the mod
 
 In this network two nodes are running:
 
-- node 0 https://node0.jaav.eu
-- node 1 https://jaav.eu
+- node 0 https://node0.jaav.eu (running console)
+- node 1 http://node1.jaav.eu  (running example app)
 
 
 
