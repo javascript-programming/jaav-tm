@@ -23,6 +23,7 @@ class ABCIServer {
                 includeDirs: [__dirname + '/proto']
             });
 
+        //test it first with > protoc --js_out=jsabci --plugin=grpc:. -I=.  ./types.proto
         this.abciProto = grpc.loadPackageDefinition(packageDefinition).types.ABCIApplication;
 
         this.stateManager.chainInfo = {
