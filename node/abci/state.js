@@ -16,7 +16,7 @@ class State {
             const cursor = mongo.database.collection(collection).find(query, { projection : fields });
 
             return new Promise((resolve, reject) => {
-                return cursor.toArray().then(result => {
+                cursor.toArray().then(result => {
                     resolve(many ? result : result[0]);
                 }).catch(reject);
             });
@@ -71,11 +71,14 @@ class State {
 
         me.aggregate = async (pipeline, collection) => {
             return new Promise((resolve, reject) => {
-                mongo.database.collection(collection).aggregate(pipeline).then(resolve).catch(reject)
+                const cursor = mongo.database.collection(collection).aggregate(pipeline);
+                cursor.toArray().then(result => {
+                    resolve(result);
+                }).catch(reject);
             });
         };
 
-        me.count = async (query) => {
+        me.count = async (query, collection) => {
             return new Promise((resolve, reject) => {
                 mongo.database.collection(collection).countDocuments(query).then(resolve).catch(reject)
             });
@@ -105,7 +108,7 @@ class State {
                 return me.count(query, collection || contract);
             },
             aggregate : (pipeline, collection) => {
-                return me.count(pipeline, collection || contract);
+                return me.aggregate(pipeline, collection || contract);
             }
         };
 
