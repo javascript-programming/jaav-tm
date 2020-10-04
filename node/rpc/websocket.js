@@ -66,18 +66,18 @@ class WebSocket {
             const transaction = TU.parsePayload(txResult.tx);
 
             const data = TU.convertObjectToHex({
-                caller : transaction.account,
-                fn     : transaction.params.fn,
-                params : transaction.params.params,
-                height : txResult.height,
-                result : contractResult,
-                address: transaction.to
+                caller  : transaction.account,
+                fn      : transaction.params.fn,
+                params  : transaction.params.params,
+                height  : txResult.height,
+                result  : contractResult,
+                address : transaction.to
             });
 
             response.success = true;
             response.id = transaction.to;
             response.result = {
-                    data: data
+                data: data
             };
 
             ws.send(TU.stringify(response));
