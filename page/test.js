@@ -1,4 +1,4 @@
-const webclient = new WebClient('ws://localhost:3000');
+const webclient = new WebClient('ws://localhost:3010');
 webclient.connect().then(async () => {
     let accounts = await webclient.getAccounts();
     console.log(accounts);

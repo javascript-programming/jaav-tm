@@ -1,5 +1,6 @@
 const CU = require('../common/contractutils');
-const TU = require('../common/transactionutils');
+const config = require('config');
+const settings = config.get('settings');
 
 function executeContract (contract, state, fn, params, account, value) {
 
@@ -23,7 +24,7 @@ function executeContract (contract, state, fn, params, account, value) {
                 if (result instanceof Promise) {
                     result = await result;
                 }
-;
+
                 resolve({
                     result: result,
                     state : instance.state,
@@ -51,6 +52,12 @@ class ContractHandler {
     static deploy_contract (state, tx) {
         return new Promise(async (resolve, reject) => {
             try {
+
+                if (settings.disableDeploy) {
+                    reject('Deploy is disabled');
+                    return;
+                }
+
                 const account = await state.getAccount(tx.account);
 
                 if (!account) {
@@ -81,7 +88,7 @@ class ContractHandler {
                     };
 
                     try {
-                        await state.insertRecord(contract, 'contracts');
+                        await state.insertRecord(false, contract, 'contracts');
                     } catch (ee) {
                         // debugger
                     }
@@ -96,7 +103,7 @@ class ContractHandler {
                     contract.deployed = true;
                 }
 
-                await state.updateRecord(tx.to, contract, 'contracts');
+                await state.updateRecord(false, tx.to, contract, 'contracts');
 
                 resolve({
                     log   : 'Contract deployment',
@@ -130,9 +137,14 @@ class ContractHandler {
 
                     //todo check value and balance sender
                     contract.database = state.getContractDatabase(contract.address, true);
+
+                    if (state.hasOracle) {
+                        contract.oracle = state.getOracleDatabase();
+                    }
+
                     const result = await executeContract(contract, contract.state, tx.params.fn, tx.params.params, tx.account, tx.value);
 
-                    await state.updateRecord(tx.to, { state : contract.state }, 'contracts');
+                    await state.updateRecord(false, tx.to, { state : contract.state }, 'contracts');
 
                     resolve({
                         log   : 'Contract call executed',
@@ -164,6 +176,11 @@ class ContractHandler {
                     }
 
                     contract.database = state.getContractDatabase(contract.address, false);
+
+                    if (state.hasOracle) {
+                        contract.oracle = state.getOracleDatabase();
+                    }
+
                     const result = await executeContract(contract, contract.state, fn, params, account);
                     resolve(result.result);
 
@@ -212,8 +229,8 @@ class ContractHandler {
                         cashRecord = {to: tx.to, amount: tx.value, message};
                         fromContract.cashbook.push(cashRecord);
 
-                        await state.updateRecord(toAccount._id, toAccount, toAccount.abi ? 'contracts' : 'accounts');
-                        await state.updateRecord(fromContract._id, fromContract, 'contracts');
+                        await state.updateRecord(false, toAccount._id, toAccount, toAccount.abi ? 'contracts' : 'accounts');
+                        await state.updateRecord(false, fromContract._id, fromContract, 'contracts');
 
                     } else {
                         reject('Insufficient funds you have!');

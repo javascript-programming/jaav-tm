@@ -20,19 +20,19 @@ class Wallet {
             this.wallet = JSON.parse(fs.readFileSync(this.walletPath));
         } else {
 
-            let keys = TU.createNewKeyAndAddress();
+          //  let keys = TU.createNewKeyAndAddress();
 
             this.wallet = {
                 accounts : {},
-                names : {},
-                account  : keys.address
+                names : {}
+                // account  : keys.address
             };
 
-            this.addAccount(keys).then(() => {
-                this.createAccount();
-            }).catch((ex) => {
-                console.log(ex);
-            });
+            // this.addAccount(keys).then(() => {
+            //     this.createAccount();
+            // }).catch((ex) => {
+            //     console.log(ex);
+            // });
         }
 
         this.unlocked = {};

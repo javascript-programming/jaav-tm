@@ -11,13 +11,17 @@ class Mongo {
         });
     }
 
-     connect () {
+     connect (clear = true) {
         const me = this;
         return new Promise((resolve, reject) => {
             me.connection = this.client.connect().then(connection => {
                 me.connection = connection;
                 me.isConnected = true;
-                this.clearDatabase().then(resolve);
+                if (clear) {
+                    this.clearDatabase().then(resolve);
+                } else {
+                    resolve();
+                }
             }).catch(reject);
         });
     }
