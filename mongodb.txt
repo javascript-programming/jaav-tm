@@ -1,0 +1,43 @@
+use admin
+db.createUser(
+  {
+    user: "jaavnl",
+    pwd: "'password'",
+    roles: [ { role: 'root', db: 'admin' } ]
+  }
+)
+
+address : {
+
+}
+
+use admin
+db.createUser(
+  {
+    user: "node0",
+    pwd: "yourpw",
+    roles: [
+       { role: "readWrite", db: "node0" }
+    ]
+  }
+)
+
+db.createUser(
+  {
+    user: "node1",
+    pwd: "'password'",
+    roles: [
+       { role: "readWrite", db: "node1" }
+    ]
+  }
+)
+
+db.createUser(
+  {
+    user: "oracle",
+    pwd: "'password'",
+    roles: [
+       { role: "readWrite", db: "oracle" }
+    ]
+  }
+)

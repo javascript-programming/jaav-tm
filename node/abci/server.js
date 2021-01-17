@@ -6,9 +6,9 @@ const StateManager = require('./statemanager');
 
 class ABCIServer {
 
-    constructor (mongo) {
+    constructor (stateDb, oracleDb) {
 
-        this.stateManager = new StateManager(mongo);
+        this.stateManager = new StateManager(stateDb, oracleDb);
 
         this.PROTO_PATH = __dirname + '/proto/types.proto';
 
@@ -276,11 +276,13 @@ class ABCIServer {
     }
 
     start (port = 46658) {
-        this.stateManager.connect().then(()=> {
-            this.server.bind('0.0.0.0:' + port, grpc.ServerCredentials.createInsecure());
-            this.server.start();
+        return new Promise((resolve, reject) => {
+            this.stateManager.connect().then(()=> {
+                this.server.bind('0.0.0.0:' + port, grpc.ServerCredentials.createInsecure());
+                this.server.start();
+                resolve();
+            }).catch(reject);
         });
-
     }
 }
 

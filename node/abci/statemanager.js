@@ -8,28 +8,43 @@ const State = require('./state');
 
 class StateManager {
 
-    constructor (mongo) {
-        this.mongo = mongo;
+    constructor (state, oracle) {
+        this.stateDb = state;
+        this.oracleDb = oracle;
     }
 
     get state () {
-        return new State(this.mongo);
+        return new State(this.stateDb, this.oracleDb);
     }
 
     connect () {
-        return this.mongo.connect();
+        return new Promise((resolve, reject) => {
+            this.stateDb.connect().then(()=> {
+                if (this.oracleDb) {
+                    this.oracleDb.connect(false).then(()=>{
+                        resolve();
+                    }).catch(err => {
+                        reject();
+                    });
+                } else {
+                    resolve();
+                }
+            }).catch(err => {
+                reject();
+            });
+        });
     }
 
     beginTransaction (state) {
-        this.mongo.beginTransaction(state);
+        this.stateDb.beginTransaction(state);
     }
 
     abortTransaction (state) {
-        return this.mongo.abortTransaction(state);
+        return this.stateDb.abortTransaction(state);
     }
 
     endTransaction (state) {
-        return this.mongo.endTransaction(state);
+        return this.stateDb.endTransaction(state);
     }
 
     set chainInfo (value) {
@@ -42,7 +57,7 @@ class StateManager {
 
     get hash () {
         return new Promise ((resolve, reject) => {
-            this.mongo.getHash().then(hash => {
+            this.stateDb.getHash().then(hash => {
                 resolve(TU.sha256(stringify(hash)));
             }).catch(reject);
         });
@@ -60,7 +75,7 @@ class StateManager {
 
             let result = {};
             result[collection] = {};
-            state.getRecord({_id: id }, collection).then(record => {
+            state.getRecord(false,{_id: id }, collection).then(record => {
                 result[collection][id] = record;
                 for (let i = 0; i < path.length; i++) {
                     result = result[path[i]];
@@ -90,13 +105,11 @@ class StateManager {
             try {
                 const params = TU.parseJson(Buffer.from(request.data));
                 const data = await this.getPathData(path, state);
-                //this.beginTransaction(state);
                 if (params.fn) {
                     result.value = await ContractHandler.query_contract(state, params.account, data, params.fn, params.params);
                 } else {
                     result.value = data;
                 }
-                //await this.endTransaction(state);
                 result.value = Buffer.from(stringify(result.value || {}));
                 result.proof = TU.sha256(result.value);
                 result.code = 0;

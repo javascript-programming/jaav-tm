@@ -147,7 +147,7 @@ class HttpServer {
         const value = 0;
         const params = req.body.params;
 
-        let result = await this.middleware['callContract'].handler(account, password, address, fn, value, params);
+        const result = await this.middleware['callContract'].handler(account, password, address, fn, value, params);
 
         try {
             res.send({
@@ -169,7 +169,7 @@ class HttpServer {
         const fn = req.params.method;
         const params = req.body.params;
 
-        let result = await this.middleware['queryContract'].handler(account, address, fn, params);
+        const result = await this.middleware['queryContract'].handler(account, address, fn, params);
 
         try {
             res.send({
@@ -186,7 +186,8 @@ class HttpServer {
 
     async getContractState (req, res) {
 
-        let result = await this.middleware['state'].handler(req.params.address);
+        const result = await this.middleware['state'].handler(req.params.address);
+
         res.send({
             success : result ? true : false,
             result  : result || 'Not found'

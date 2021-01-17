@@ -1,4 +1,3 @@
-
 class ClientContract {
 
     constructor (client, address, abi, account) {
@@ -11,7 +10,7 @@ class ClientContract {
         const generateFunction = (target, fn, params) => {
             const body = {};
             let method, initialParams = [account, address, fn].map(item => "'" + item + "'");
-            const isCall = !fn.startsWith('get');
+            const isCall = (!fn.startsWith('get') || !fn.startsWith('oracle'));
 
             if (!isCall) {
                 method = 'queryContract';

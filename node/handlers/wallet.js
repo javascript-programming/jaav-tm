@@ -1,3 +1,6 @@
+const config = require('config');
+const settings = config.get('settings');
+
 class WalletHandler {
 
     static getNameSpace () {
@@ -9,6 +12,11 @@ class WalletHandler {
         return new Promise(async (resolve, reject) => {
 
             try {
+
+                if (settings.disableNewAccount) {
+                    reject('New accounts are disabled');
+                    return;
+                }
 
                 if (tx.params.account !== tx.account) {
                     reject('Account origin should be sender');
@@ -26,7 +34,7 @@ class WalletHandler {
                     cashbook: []
                 };
 
-                await state.insertRecord(newAccount, 'accounts');
+                await state.insertRecord(false, newAccount, 'accounts');
 
                 resolve({
                     log   : 'Account created',
@@ -76,8 +84,8 @@ class WalletHandler {
                         cashRecord = {to: tx.to, amount: tx.value, message};
                         fromAccount.cashbook.push(cashRecord);
 
-                        await state.updateRecord(toAccount._id, toAccount, toAccount.abi ? 'contracts' : 'accounts');
-                        await state.updateRecord(fromAccount._id, fromAccount, 'accounts');
+                        await state.updateRecord(false, toAccount._id, toAccount, toAccount.abi ? 'contracts' : 'accounts');
+                        await state.updateRecord(false, fromAccount._id, fromAccount, 'accounts');
 
                     } else {
                         reject('Insufficient funds you have!');

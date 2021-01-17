@@ -1,0 +1,44 @@
+{
+  "settings" : {
+    "disableDeploy": false,
+    "disableNewAccount": false
+  },
+  "server": {
+    "tendermint": {
+      "home": "",
+      "node": "single",
+      "port": 46657
+    },
+    "rpc": {
+      "port": 80,
+      "securePort": 443
+    },
+    "abci": {
+      "port": 46658,
+      "state": {
+        "host": "127.0.0.1",
+        "port": 27017,
+        "user": "single",
+        "database": "single",
+        "password": ""
+      },
+      "oracle": {
+        "host": "127.0.0.1",
+        "port": 27017,
+        "user": "oracle",
+        "database": "oracle",
+        "password": ""
+      }
+    }
+  },
+  "init": {
+    "actions": [
+      { "variable": "password", "value": "'password'" },
+      { "cmd": "createNamedAccount", "params": ["$password", "Admin"], "variable": "account", "key": "address" },
+      { "cmd": "setMainAccount", "params" : ["$account"] },
+      { "cmd": "compile" },
+      { "cmd": "deploy", "params": ["$account", "$password", "HelloWorld"], "variable": "helloworld", "key": "address" },
+      { "cmd": "queryContract", "params": ["$account", "$helloworld", "hello", ["world"]], "cron": "1 1-10 * * * *" }
+    ]
+  }
+}

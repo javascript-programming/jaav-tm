@@ -139,6 +139,10 @@ class TransActionUtils {
         return Buffer.from(stringify(obj)).toString('hex');
     }
 
+    static convertHexToString (str) {
+        return Buffer.from(str, 'hex').toString('utf8');
+    }
+
     static signTx (tx, privKey) {
 
         let stx = this.getSigMsg(tx);
