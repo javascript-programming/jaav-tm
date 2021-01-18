@@ -61,7 +61,7 @@ class State {
 
         me.updateRecords = async (oracle, filter, update, collection, upsert) => {
 
-            const db = oracle ? oracleDb : statedb;
+            const db = oracle ? oracleDb : stateDb;
 
             return new Promise((resolve, reject) => {
                 db.database.collection(collection).updateMany(filter,{ $set: update }, { session: me.session, upsert: upsert }).then((result) => {
@@ -76,7 +76,7 @@ class State {
 
         me.bulkWrite = async (oracle, operations, collection) => {
 
-            const db = oracle ? oracleDb : statedb;
+            const db = oracle ? oracleDb : stateDb;
 
             return new Promise((resolve, reject) => {
                 db.database.collection(collection).bulkWrite(operations, {session: me.session}).then(result => {
@@ -91,7 +91,7 @@ class State {
 
         me.aggregate = async (oracle, pipeline, collection) => {
 
-            const db = oracle ? oracleDb : statedb;
+            const db = oracle ? oracleDb : stateDb;
 
             return new Promise((resolve, reject) => {
                 const cursor = db.database.collection(collection).aggregate(pipeline);
