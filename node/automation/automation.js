@@ -1,12 +1,14 @@
 const TU = require('../common/transactionutils');
 const CronJob = require('cron').CronJob;
+const Fetch = require('./fetch');
 
 class Automation {
 
-    constructor(functions) {
+    constructor(functions, rebuild) {
         this.variables = {};
         this.functions = functions;
         this.jobs = {};
+        this.rebuild = rebuild;
     }
 
     async executeActions (actions = []) {
@@ -38,12 +40,13 @@ class Automation {
                         }
                     });
             } else {
-
-                await me.executeCommand(action).catch(err => {
-                    console.log(err.message);
-                    i = actions.length;
-                    console.log('Stopped executing actions');
-                });
+                if (me.rebuild) {
+                    await me.executeCommand(action).catch(err => {
+                        console.log(err.message);
+                        i = actions.length;
+                        console.log('Stopped executing actions');
+                    });
+                }
             }
         }
     }
@@ -56,6 +59,19 @@ class Automation {
 
                 let result = null;
 
+                if (action.fetch) {
+
+                    let filter = null;
+
+                    if (action.fetch.filter) {
+                        try {
+                            eval('filter = ' + action.fetch.filter);
+                        } catch (err) {}
+                    }
+
+                    this.variables[action.fetch.variable || "fetch"] = await Fetch.data(action.fetch.url, action.fetch.params, filter);
+                }
+
                 if (action.cmd) {
                     let params = action.params || [];
                     params = params.map(item => (item && item.startsWith && item.startsWith('$')) ? this.variables[item.substring(1)] : item);
@@ -67,7 +83,11 @@ class Automation {
                     }
 
                     if (result && result.jsonrpc && result.result) {
-                        result = TU.parseJson(TU.convertHexToString(result.result.data));
+                           try {
+                               result = TU.parseJson(TU.convertHexToString(result.result.data));
+                           } catch (err) {
+                               console.log(result.result.log);
+                        }
                     }
 
                     console.log(result);

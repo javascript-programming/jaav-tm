@@ -37,17 +37,14 @@ const startRpc = () => {
         const functions = console.getFunctions();
 
         rpcServer.startServer(functions);
-
-        if (options.rebuild) {
-            startAutomation(functions);
-        }
+        startAutomation(functions);
 
     }).catch(err => console.log(err));
 };
 
 const startAutomation = (functions) => {
     const Automation = require('./automation/automation');
-    const automation = new Automation(functions);
+    const automation = new Automation(functions, options.rebuild);
     automation.executeActions(config.get('init.actions'));
 };
 
