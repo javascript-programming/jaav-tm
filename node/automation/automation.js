@@ -69,7 +69,10 @@ class Automation {
                         } catch (err) {}
                     }
 
-                    this.variables[action.fetch.variable || "fetch"] = await Fetch.data(action.fetch.url, action.fetch.params, filter);
+                    if (action.fetch.url || action.fetch.data) {
+                        this.variables[action.fetch.variable] = await Fetch.data(action.fetch.url || action.fetch.data, action.fetch.params, filter);
+                    }
+
                 }
 
                 if (action.cmd) {

@@ -1,16 +1,9 @@
-class GeozetBekendmakingen {
+class BiomassaMeldpunt {
 
     constructor (initialState) {
-        this.state = initialState || {};
-    }
-
-    insertRecord (record) {
-
-        if (this.caller !== this.owner) {
-            throw new Error('This account has no permission to add record');
-        }
-
-        return this.database.insert(record);
+        this.state = initialState || {
+            latestId : 0
+        };
     }
 
     updateRecords (features) {
@@ -22,10 +15,13 @@ class GeozetBekendmakingen {
 
         for (let i = 0; i < features.length; i++) {
             const feature = features[i];
-            feature.state = feature.properties.titel.indexOf('Aanvraag omgevingsvergunning') !== -1 ? 'Aanvraag' : 'Verleend';
-            feature.state = feature.properties.titel.indexOf('Geweigerde omgevingsvergunning') !== -1 ? 'Geweigerd' : feature.state;
-
-            operations.push({ filter : { _id: feature.properties.oid }, update: feature});
+            this.state.latestId++;
+            feature.properties.beschrijving = feature.properties.description;
+            feature.properties.titel = feature.properties.Name;
+            feature.state = 'Goedgekeurd';
+            delete feature.properties.description;
+            delete feature.properties.Name;
+            operations.push({ filter : { _id: this.state.latestId }, update: feature});
         }
 
         return this.database.updates(operations, true);
