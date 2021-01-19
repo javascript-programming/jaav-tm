@@ -96,7 +96,6 @@ class Contracts {
     }
 
 
-
     compile () {
         const content = fs.readdirSync(this.contractSourceFolder);
 
