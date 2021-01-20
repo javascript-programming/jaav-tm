@@ -67,6 +67,11 @@ class Contracts {
             handler : (...params) => { return me.queryContract.apply(me, params); }
         });
 
+        console.setFunction('oracleContract', {
+            params  : ['account', 'password', 'address', 'function name', 'params'],
+            handler : (...params) => { return me.oracleContract.apply(me, params); }
+        });
+
         console.setFunction('callContract', {
             params  : ['account', 'password', 'address', 'function name', 'value', 'params'],
             handler : (...params) => { return me.callContract.apply(me, params); },
@@ -247,7 +252,25 @@ class Contracts {
             params = params.split(',');
         }
 
+        if (fn.startsWith('oracle')) {
+            throw new Error('Cannot call oracle without password')
+        }
+
         return await this.client.query(`contracts/${address}`, { account, params, fn });
+    }
+
+    oracleContract (account, password, address, fn, ...params) {
+
+        return new Promise((resolve, reject) => {
+            if (typeof params === 'string' || params instanceof String) {
+                params = params.split(',');
+            }
+
+            this.wallet.unlockAccount(account, password).then(record => {
+                this.client.query(`contracts/${address}`, { account, params, fn }).then(resolve).catch(reject);
+            }).catch(reject);
+        });
+
     }
 
     callContract (account, password, address, fn, value, ...params) {

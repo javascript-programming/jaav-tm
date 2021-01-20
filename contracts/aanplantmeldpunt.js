@@ -20,7 +20,7 @@ class AanplantMeldpunt {
             feature.properties.titel = feature.properties.Name;
             delete feature.properties.description;
             delete feature.properties.Name;
-            feature.state = 'Goedgekeurd';
+            feature.state = feature.state || 'Goedgekeurd';
             operations.push({ filter : { _id: this.state.latestId }, update: feature});
         }
 
@@ -39,53 +39,5 @@ class AanplantMeldpunt {
         } else {
             throw new Error('Index was already created');
         }
-    }
-
-    getLocations (polygone, state, types) {
-
-        return new Promise((resolve, reject) => {
-            try {
-
-                const query = {};
-
-                if (polygone) {
-                    query.geometry = {
-                        $geoWithin: {
-                            $geometry: {
-                                type       : "Polygon",
-                                coordinates: [polygone]
-                            }
-                        }
-                    };
-                }
-
-                if (state && state.length) {
-                    query.state = { $in: state };
-                }
-
-                this.database.query(query, {
-                    geometry            : 1,
-                    type                : 1,
-                    properties          : 1,
-                    state               : 1
-                }).then(features => {
-                    resolve(features);
-                });
-            } catch (err) {
-                throw new Error(err.message);
-            }
-        });
-    }
-
-    getData (query, fields) {
-        return this.database.query(query, fields);
-    }
-
-    getAggregatedData (pipeline) {
-        return this.database.aggregate(pipeline);
-    }
-
-    getCount (query) {
-        return this.database.count(query);
     }
 }

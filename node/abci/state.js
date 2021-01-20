@@ -165,7 +165,7 @@ class State {
         return Object.assign(read, write ? update: {});
     }
 
-    getOracleDatabase () {
+    getOracleDatabase (write) {
 
         const me = this;
         const read = {
@@ -190,18 +190,18 @@ class State {
             update : (filter, update, upsert, collection) => {
                 return me.updateRecords(true, filter, update, collection, upsert);
             },
-            updates : (operations = [], upsert = false) => {
+            updates : (operations = [], upsert = false, collection) => {
                 operations = operations.map(operation => {
                     return { updateOne: { filter: operation.filter, update: {$set: operation.update}, upsert: upsert } }
                 });
                 return me.bulkWrite(true, operations, collection);
             },
-            createIndex : (field, type) => {
+            createIndex : (field, type, collection) => {
                 return me.createIndex(true, field, type, collection);
             }
         };
 
-        return Object.assign(read, update);
+        return Object.assign(read, write ? update: {});
     }
 
 }
