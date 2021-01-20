@@ -16,6 +16,7 @@ function executeContract (contract, state, fn, params, account, value) {
                 instance.caller = account;
                 instance.value = value;
                 instance.database = contract.database;
+                instance.oracle = contract.oracle;
                 instance.owner = contract.owner;
 
                 const fnRef = instance[fn];
@@ -139,7 +140,7 @@ class ContractHandler {
                     contract.database = state.getContractDatabase(contract.address, true);
 
                     if (state.hasOracle) {
-                        contract.oracle = state.getOracleDatabase();
+                        contract.oracle = state.getOracleDatabase(true);
                     }
 
                     const result = await executeContract(contract, contract.state, tx.params.fn, tx.params.params, tx.account, tx.value);
@@ -178,7 +179,11 @@ class ContractHandler {
                     contract.database = state.getContractDatabase(contract.address, false);
 
                     if (state.hasOracle) {
-                        contract.oracle = state.getOracleDatabase();
+                        if (fn.startsWith('oracle')) {
+                            contract.oracle = state.getOracleDatabase(true);
+                        } else {
+                            contract.oracle = state.getOracleDatabase(false);
+                        }
                     }
 
                     const result = await executeContract(contract, contract.state, fn, params, account);
