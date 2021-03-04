@@ -9,9 +9,11 @@ class ClientBase {
     }
 
     fromHex (hex) {
-        return hex.toString().match(/.{1,2}/g).map(function(v){
-            return String.fromCharCode(parseInt(v, 16));
-        }).join('');
+
+        return decodeURIComponent(hex.replace(/\s+/g, '').replace(/[0-9a-f]{2}/g, '%$&'));
+        // return hex.toString().match(/.{1,2}/g).map(function(v) {
+        //     return String.fromCharCode(parseInt(v, 16));
+        // }).join('');
     }
 
     getListenerName (string) {
