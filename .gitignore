@@ -7,5 +7,3 @@
 !/node_modules/abci/
 /examples/
 /node/rpc/cert/
-/config/data/
-/node/automation/data/
