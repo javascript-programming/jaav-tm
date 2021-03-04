@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="9ad3fc1f-afe4-4ae3-9399-05fc40e03226" name="jaav.eu" url="http://jaav.eu">
+        <fileTransfer host="jaav.eu" port="22" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+      <webServer id="fae76a2a-a322-4fda-b37e-7014ad7764bf" name="node0.jaav.eu" url="http://node0.jaav.eu">
+        <fileTransfer host="node0.jaav.eu" port="22" rootFolder="/home/jaavnl" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

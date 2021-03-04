@@ -13,10 +13,10 @@ class WalletHandler {
 
             try {
 
-                if (settings.disableNewAccount) {
-                    reject('New accounts are disabled');
-                    return;
-                }
+                // if (settings.disableNewAccount) {
+                //     reject('New accounts are disabled');
+                //     return;
+                // }
 
                 if (tx.params.account !== tx.account) {
                     reject('Account origin should be sender');

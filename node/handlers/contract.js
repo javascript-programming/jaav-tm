@@ -54,10 +54,10 @@ class ContractHandler {
         return new Promise(async (resolve, reject) => {
             try {
 
-                if (settings.disableDeploy) {
-                    reject('Deploy is disabled');
-                    return;
-                }
+                // if (settings.disableDeploy) {
+                //     reject('Deploy is disabled');
+                //     return;
+                // }
 
                 const account = await state.getAccount(tx.account);
 

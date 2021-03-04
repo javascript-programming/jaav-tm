@@ -15,13 +15,26 @@ class BiomassaMeldpunt {
 
         for (let i = 0; i < features.length; i++) {
             const feature = features[i];
-            this.state.latestId++;
-            feature.properties.beschrijving = feature.properties.description;
-            feature.properties.titel = feature.properties.Name;
-            delete feature.properties.description;
-            delete feature.properties.Name;
+
+            let id = feature._id;
+
+            if (!id) {
+                this.state.latestId++;
+                id = this.state.latestId;
+            }
+
+            if (feature.properties.description) {
+                feature.properties.beschrijving = feature.properties.description;
+                delete feature.properties.description;
+            }
+
+            if (feature.properties.Name) {
+                feature.properties.titel = feature.properties.Name;
+                delete feature.properties.Name;
+            }
+
             feature.state = feature.state || 'Goedgekeurd';
-            operations.push({ filter : { _id: this.state.latestId }, update: feature});
+            operations.push({ filter : { _id: id }, update: feature });
         }
 
         return this.database.updates(operations, true);

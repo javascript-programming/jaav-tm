@@ -10,18 +10,24 @@ class ClientContract {
         const generateFunction = (target, fn, params) => {
             const body = {};
             let method, initialParams = [account, address, fn].map(item => "'" + item + "'");
-            const isCall = (!fn.startsWith('get') || !fn.startsWith('oracle'));
+            const isQuery = fn.startsWith('get');
+            const isOracle = fn.startsWith('oracle');
 
-            if (!isCall) {
+            if (isQuery) {
                 method = 'queryContract';
-            } else {
-                method = 'callContract';
-                initialParams.push(0);
+            }
+            else {
+                method = isOracle ? 'oracleContract' : 'callContract';
+
+                if (!isOracle) {
+                    initialParams.push(0);
+                }
+
                 initialParams.splice(1, 0, 'password');
             }
 
-            eval(`body[fn] = function (${params.join(', ')} ${ isCall ? ', password' : '' }) {
-                return this._client.makeRequest('${method}', ${ initialParams.join(',') }, ${ params.join(',') });
+            eval(`body[fn] = function (${params.join(', ')} ${ !isQuery ?  params.length ? ', password' : 'password' : '' }) {
+                return this._client.makeRequest('${method}', ${ initialParams.join(',') } ${params.length ? ',' : ''} ${ params.join(',') });
              }`);
 
             Object.assign(target, body);

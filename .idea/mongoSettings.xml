@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="MongoConfiguration">
+    <option name="serverConfigurations">
+      <list>
+        <ServerConfiguration>
+          <option name="authenticationDatabase" value="admin" />
+          <option name="authenticationMechanism" value="SCRAM-SHA-1" />
+          <option name="label" value="jaav.eu single" />
+          <option name="password" value="'password'" />
+          <option name="serverUrls">
+            <list>
+              <option value="jaav.eu:27017" />
+            </list>
+          </option>
+          <option name="sshTunnelingConfiguration">
+            <SshTunnelingConfiguration />
+          </option>
+          <option name="userDatabase" value="single" />
+          <option name="username" value="single" />
+        </ServerConfiguration>
+        <ServerConfiguration>
+          <option name="authenticationDatabase" value="admin" />
+          <option name="authenticationMechanism" value="SCRAM-SHA-1" />
+          <option name="label" value="jaav.eu node1" />
+          <option name="password" value="'password'" />
+          <option name="serverUrls">
+            <list>
+              <option value="jaav.eu:27017" />
+            </list>
+          </option>
+          <option name="sshTunnelingConfiguration">
+            <SshTunnelingConfiguration />
+          </option>
+          <option name="userDatabase" value="node1" />
+          <option name="username" value="node1" />
+        </ServerConfiguration>
+        <ServerConfiguration>
+          <option name="authenticationDatabase" value="admin" />
+          <option name="authenticationMechanism" value="SCRAM-SHA-1" />
+          <option name="label" value="node0.jaav.eu" />
+          <option name="password" value="'password'" />
+          <option name="serverUrls">
+            <list>
+              <option value="node0.jaav.eu:27017" />
+            </list>
+          </option>
+          <option name="sshTunnelingConfiguration">
+            <SshTunnelingConfiguration />
+          </option>
+          <option name="userDatabase" value="node0" />
+          <option name="username" value="node0" />
+        </ServerConfiguration>
+        <ServerConfiguration>
+          <option name="authenticationDatabase" value="admin" />
+          <option name="authenticationMechanism" value="SCRAM-SHA-1" />
+          <option name="label" value="oracle" />
+          <option name="password" value="'password'" />
+          <option name="serverUrls">
+            <list>
+              <option value="jaav.eu:27017" />
+            </list>
+          </option>
+          <option name="sshTunnelingConfiguration">
+            <SshTunnelingConfiguration />
+          </option>
+          <option name="userDatabase" value="oracle" />
+          <option name="username" value="oracle" />
+        </ServerConfiguration>
+      </list>
+    </option>
+  </component>
+</project>
