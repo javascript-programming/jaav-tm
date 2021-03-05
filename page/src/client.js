@@ -15,6 +15,21 @@ class WebClient extends ClientBase {
         return this.makeRequest('getBalance', account);
     }
 
+    createAccount (password) {
+        const fn = async () => {
+            const result = await this.makeRequest('createAccount', password);
+            return result.data;
+        };
+        return fn();
+    }
+
+    createNamedAccount (password, name) {
+        const fn = async () => {
+            const result = await this.makeRequest('createAccount', password, name);
+            return result.data;
+        };
+        return fn();
+    }
 
     getAccount (name, password) {
         return this.makeRequest('getAccount', name, password);
@@ -31,6 +46,23 @@ class WebClient extends ClientBase {
     getContracts () {
         return this.makeRequest('contracts');
     }
+
+    compile () {
+        return this.makeRequest('compile');
+    }
+
+    upload (cls) {
+        return this.makeRequest('upload', cls.toString());
+    }
+
+    deploy (account, password, contract) {
+        const fn = async () => {
+            const result = await this.makeRequest('deploy', account, password, contract);
+            return result.data;
+        };
+        return fn();
+    }
+
 
     // Can only register one instance of a unique address
     getRegisteredContract (address, account) {
