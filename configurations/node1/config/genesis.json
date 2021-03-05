@@ -19,24 +19,6 @@
       },
       "power": "1",
       "name": "node1"
-    },
-    {
-      "address": "4D90C0853D0DB2D9037955E915FBE0105880E858",
-      "pub_key": {
-        "type": "tendermint/PubKeyEd25519",
-        "value": "EOhmA6kQ2AtWApf50hplKU5D0P8/rfvovCEZc3cq1pg="
-      },
-      "power": "1",
-      "name": "node2"
-    },
-    {
-      "address": "2A7AB0495AF7D2087ED4FED97A1AF9DA3E3ED462",
-      "pub_key": {
-        "type": "tendermint/PubKeyEd25519",
-        "value": "6j2+VTKbyb9V5pBc8A3sxXdHFJG8NSx6ydlxsWBX+JA="
-      },
-      "power": "1",
-      "name": "node3"
     }
   ],
   "app_hash": ""
