@@ -49,13 +49,13 @@
         "runOnInit": true,
         "fetch": {
           "variable": "geozetdata",
-          "filter": "result => result.features.filter(f => { return f.properties.titel.indexOf('vellen') !== -1; });",
+          "filter": "result => result.features.filter(f => { return (f.properties.titel.indexOf('vellen') !== -1) || (f.properties.titel.indexOf('kappen') !== -1) || (f.properties.titel.indexOf('bomen') !== -1) || (f.properties.titel.indexOf('boom') !== -1) || (f.properties.titel.indexOf('houtopstand') !== -1) } );",
           "url": "http://geozet.koop.overheid.nl/wfs",
           "params": {
             "REQUEST" : "GetFeature",
             "VERSION" : "1.1.0",
             "TYPENAME" : "bekendmakingen_punt",
-            "cql_filter" : "(overheid in ('Groningen','Het Hogeland', 'Loppersum', 'Appingedam', 'Delfzijl', 'Oldambt', 'Pekela', 'Midden-Groningen', 'Westerkwartier', 'Westerwolde', 'Veendam', 'Stadskanaal') and categorie='wonen')",
+            "cql_filter" : "(overheid in ('Groningen','Eemsdelta', 'Het Hogeland', 'Midden-Groningen', 'Oldambt', 'Pekela', 'Stadskanaal', 'Veendam', 'Westerkwartier', 'Westerwolde') and categorie='wonen')",
             "OUTPUTFORMAT" : "JSON",
             "srsName": "EPSG:4326"
           }
