@@ -1,6 +1,17 @@
 const CU = require('../common/contractutils');
 const config = require('config');
-const settings = config.get('settings');
+
+const nodemailer = require("nodemailer");
+const smtp = config.get('smtp');
+const mail = nodemailer.createTransport({
+    host: smtp.host,
+    port: smtp.ssl,
+    secure: true,
+    auth: {
+        user: smtp.user,
+        pass: smtp.password
+    },
+});
 
 function executeContract (contract, state, fn, params, account, value) {
 
@@ -53,11 +64,6 @@ class ContractHandler {
     static deploy_contract (state, tx) {
         return new Promise(async (resolve, reject) => {
             try {
-
-                // if (settings.disableDeploy) {
-                //     reject('Deploy is disabled');
-                //     return;
-                // }
 
                 const account = await state.getAccount(tx.account);
 
@@ -180,6 +186,7 @@ class ContractHandler {
 
                     if (state.hasOracle) {
                         if (fn.startsWith('oracle')) {
+                            contract.mail = mail;
                             contract.oracle = state.getOracleDatabase(true);
                         } else {
                             contract.oracle = state.getOracleDatabase(false);
