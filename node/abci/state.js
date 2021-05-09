@@ -23,9 +23,11 @@ class State {
                     const cursor = db.database.collection(collection).find(query, {projection: fields});
                     cursor.toArray().then(result => {
                         resolve(many ? result : result[0]);
-                    }).catch(reject);
+                    }).catch(err => {
+                        resolve({success : false, err });
+                    });
                 } catch (err) {
-                    reject(err.message);
+                    resolve({ success : false, err });
                 }
             });
         };
@@ -38,7 +40,9 @@ class State {
                 const fn = Array.isArray(record) ? 'insertMany' : 'insertOne';
                 db.database.collection(collection)[fn](record, { session: me.session }).then((result) => {
                     resolve({count : result.insertedCount});
-                }).catch(reject)
+                }).catch(err => {
+                    resolve({ success : false, err });
+                });
             });
         };
 
@@ -55,7 +59,9 @@ class State {
                         matchedCount: result.matchedCount,
                         modifiedCount: result.modifiedCount
                     });
-                }).catch(reject)
+                }).catch(err => {
+                    resolve({ success : false, err });
+                });
             });
         };
 
@@ -70,7 +76,9 @@ class State {
                         matchedCount: result.matchedCount,
                         modifiedCount: result.modifiedCount
                     });
-                }).catch(reject)
+                }).catch(err => {
+                    resolve({ success : false, err });
+                })
             });
         };
 
@@ -85,7 +93,9 @@ class State {
                         matchedCount : result.matchedCount,
                         modifiedCount: result.modifiedCount
                     });
-                }).catch(reject);
+                }).catch( err => {
+                    resolve({ success : false, err });
+                });
             });
         };
 
@@ -97,7 +107,9 @@ class State {
                 const cursor = db.database.collection(collection).aggregate(pipeline);
                 cursor.toArray().then(result => {
                     resolve(result);
-                }).catch(reject);
+                }).catch( err => {
+                    resolve({ success : false, err });
+                });
             });
         };
 
@@ -106,7 +118,9 @@ class State {
             const db = oracle ? oracleDb : stateDb;
 
             return new Promise((resolve, reject) => {
-                db.database.collection(collection).countDocuments(query).then(resolve).catch(reject)
+                db.database.collection(collection).countDocuments(query).then(resolve).catch( err => {
+                    resolve({ success : false, err });
+                });
             });
         };
 
@@ -119,7 +133,9 @@ class State {
                 spec[field] = type;
                 db.database.collection(collection).createIndex(spec, { session: me.session }).then((result) => {
                     resolve(result);
-                }).catch(reject)
+                }).catch(err => {
+                    resolve({ success : false, err });
+                });
             });
         }
     }
