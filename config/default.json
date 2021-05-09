@@ -3,6 +3,13 @@
     "disableDeploy": false,
     "disableNewAccount": false
   },
+  "smtp" : {
+    "user": "terence@jaav.eu",
+    "password": "ntjcfjvrlwbyimeb",
+    "host": "smtp.gmail.com",
+    "tls" : 587,
+    "ssl" : 465
+  },
   "server": {
     "tendermint": {
       "home": "",
@@ -54,6 +61,7 @@
           "params": {
             "REQUEST" : "GetFeature",
             "VERSION" : "1.1.0",
+            "Test": "",
             "TYPENAME" : "bekendmakingen_punt",
             "cql_filter" : "(overheid in ('Groningen','Eemsdelta', 'Het Hogeland', 'Midden-Groningen', 'Oldambt', 'Pekela', 'Stadskanaal', 'Veendam', 'Westerkwartier', 'Westerwolde') and categorie='wonen')",
             "OUTPUTFORMAT" : "JSON",

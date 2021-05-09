@@ -20,6 +20,7 @@
     "json-stable-stringify": "^1.0.1",
     "mongodb": "^3.6.0",
     "node-getopt": "^0.3.2",
+    "nodemailer": "^6.6.0",
     "path": "^0.12.7",
     "readline-utils": "^2.2.3",
     "secp256k1": "^3.5.2",
