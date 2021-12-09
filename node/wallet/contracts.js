@@ -130,7 +130,7 @@ class Contracts {
                 }
 
             } catch (err) {
-                console.log(err.message);
+                console.log("Compile error on " + contractPath + ' Message: ' + err.message);
             }
         }
 
