@@ -65,7 +65,7 @@ class State {
             });
         };
 
-        me.updateRecords = async (oracle, filter, update, collection, upsert) => {
+        me.updateRecords = (oracle, filter, update, collection, upsert) => {
 
             const db = oracle ? oracleDb : stateDb;
 
@@ -82,7 +82,7 @@ class State {
             });
         };
 
-        me.bulkWrite = async (oracle, operations, collection) => {
+        me.bulkWrite = (oracle, operations, collection) => {
 
             const db = oracle ? oracleDb : stateDb;
 
@@ -99,7 +99,7 @@ class State {
             });
         };
 
-        me.aggregate = async (oracle, pipeline, collection) => {
+        me.aggregate = (oracle, pipeline, collection) => {
 
             const db = oracle ? oracleDb : stateDb;
 
@@ -113,7 +113,7 @@ class State {
             });
         };
 
-        me.count = async (oracle, query, collection) => {
+        me.count = (oracle, query, collection) => {
 
             const db = oracle ? oracleDb : stateDb;
 
