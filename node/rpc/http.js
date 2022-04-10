@@ -17,7 +17,7 @@ class HttpServer {
         //static base path should be passed with options
         app.use('/', serveStatic(path.join(__dirname, '../../../meldpunt')));
         app.use('/', serveStatic(path.join(__dirname, '../../../meldpuntadmin')));
-        // app.use('/page', serveStatic(path.join(__dirname, '../../page')));
+        app.use('/page', serveStatic(path.join(__dirname, '../../page')));
         // app.use('/examples', serveStatic(path.join(__dirname, '../../examples')));
 
         this.http = http.createServer(app);
