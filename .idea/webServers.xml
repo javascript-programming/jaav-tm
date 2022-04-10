@@ -3,19 +3,17 @@
   <component name="WebServers">
     <option name="servers">
       <webServer id="9ad3fc1f-afe4-4ae3-9399-05fc40e03226" name="jaav.eu" url="http://jaav.eu">
-        <fileTransfer host="jaav.eu" port="22" accessType="SFTP">
+        <fileTransfer rootFolder="/home/jaavnl" accessType="SFTP" host="jaav.eu" port="22" sshConfigId="836252f5-b43f-48a1-b366-25164d8ab83b" sshConfig="jaav.eu">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>
-          <option name="port" value="22" />
         </fileTransfer>
       </webServer>
       <webServer id="fae76a2a-a322-4fda-b37e-7014ad7764bf" name="node0.jaav.eu" url="http://node0.jaav.eu">
-        <fileTransfer host="node0.jaav.eu" port="22" rootFolder="/home/jaavnl" accessType="SFTP">
+        <fileTransfer rootFolder="/home/jaavnl" accessType="SFTP" host="node0.jaav.eu" port="22" sshConfigId="3ff6f30c-aa23-4052-afe8-91090b0c3cf5" sshConfig="node0.jaav.eu">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>
-          <option name="port" value="22" />
         </fileTransfer>
       </webServer>
     </option>

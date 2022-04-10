@@ -108,29 +108,33 @@ class Contracts {
 
         for (let i = 0; i < content.length; i++) {
             let contractPath = path.join(this.contractSourceFolder, content[i]);
-            let stat = fs.lstatSync(contractPath);
-            let cls = fs.readFileSync(contractPath).toString();
-            let entry;
 
-            try {
-                const contract = Compiler.compile(CU.getClass(cls));
+            if (contractPath.endsWith('.js')) {
 
-                if (!this.contracts[contract.name]) {
-                    this.contracts[contract.name] = contract;
+                let stat = fs.lstatSync(contractPath);
+                let cls = fs.readFileSync(contractPath).toString();
+                let entry;
+
+                try {
+                    const contract = Compiler.compile(CU.getClass(cls));
+
+                    if (!this.contracts[contract.name]) {
+                        this.contracts[contract.name] = contract;
+                    }
+
+                    entry = this.contracts[contract.name];
+
+                    if (entry.ctimeMs !== stat.ctimeMs) {
+                        entry.ctimeMs = stat.ctimeMs;
+                        entry.abi = contract.abi;
+                        entry.code = Buffer.from(cls).toString('base64');
+                        delete entry.address;
+                        result.push(entry.name);
+                    }
+
+                } catch (err) {
+                    console.log("Compile error on " + contractPath + ' Message: ' + err.message);
                 }
-
-                entry = this.contracts[contract.name];
-
-                if (entry.ctimeMs !== stat.ctimeMs) {
-                    entry.ctimeMs = stat.ctimeMs;
-                    entry.abi = contract.abi;
-                    entry.code = Buffer.from(cls).toString('base64');
-                    delete entry.address;
-                    result.push(entry.name);
-                }
-
-            } catch (err) {
-                console.log("Compile error on " + contractPath + ' Message: ' + err.message);
             }
         }
 
