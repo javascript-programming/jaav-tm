@@ -1,18 +1,6 @@
 const CU = require('../common/contractutils');
 const config = require('config');
 
-const nodemailer = require("nodemailer");
-const smtp = config.get('smtp');
-const mail = nodemailer.createTransport({
-    host: smtp.host,
-    port: smtp.ssl,
-    secure: true,
-    auth: {
-        user: smtp.user,
-        pass: smtp.password
-    },
-});
-
 function executeContract (contract, state, fn, params, account, value) {
 
     return new Promise(async (resolve, reject) => {
@@ -186,7 +174,6 @@ class ContractHandler {
 
                     if (state.hasOracle) {
                         if (fn.startsWith('oracle')) {
-                            contract.mail = mail;
                             contract.oracle = state.getOracleDatabase(true);
                         } else {
                             contract.oracle = state.getOracleDatabase(false);

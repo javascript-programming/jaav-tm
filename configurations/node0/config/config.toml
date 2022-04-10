@@ -142,7 +142,7 @@ external_address = ""
 seeds = ""
 
 # Comma separated list of nodes to keep persistent connections to
-persistent_peers = "18a3055a2bc0a456975d4cce324c28eb94c2e5bf@node0.jaav.eu:26656,25b436522fef732c97881fadfa2666b3fd6d20c5@jaav.eu:26656"
+persistent_peers = "18a3055a2bc0a456975d4cce324c28eb94c2e5bf@yourdomain1.com:26656,25b436522fef732c97881fadfa2666b3fd6d20c5@yourdomain2.com:26656"
 
 # UPNP port forwarding
 upnp = false
