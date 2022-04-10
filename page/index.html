@@ -25,7 +25,7 @@
                  address = deploy.address;
              }
 
-             const helloWorld = await webclient.getContract(address, accounts[0]);
+             const helloWorld = await webclient.getRegisteredContract(address, accounts[0]);
              window.helloWorld = helloWorld;
 
              helloWorld.onHello = (result, options) => {

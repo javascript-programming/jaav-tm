@@ -20,7 +20,7 @@
         "port": 27017,
         "user": "single",
         "database": "single",
-        "password": "'password'"
+        "password": ""
       },
       "oracle": {
         "host": null,
@@ -33,7 +33,7 @@
   },
   "init": {
     "actions": [
-      { "variable": "password", "value": "'password'" },
+      { "variable": "password", "value": "1234" },
       { "cmd": "createNamedAccount", "params": ["$password", "Admin"], "variable": "account", "key": "address" },
       { "cmd": "setMainAccount", "params" : ["$account"] },
       { "cmd": "compile" },
