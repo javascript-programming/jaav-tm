@@ -3,13 +3,6 @@
     "disableDeploy": false,
     "disableNewAccount": false
   },
-  "smtp" : {
-    "user": "terence@jaav.eu",
-    "password": "password",
-    "host": "smtp.gmail.com",
-    "tls" : 587,
-    "ssl" : 465
-  },
   "server": {
     "tendermint": {
       "home": "",
@@ -30,66 +23,22 @@
         "password": "'password'"
       },
       "oracle": {
-        "host": "jaav.eu",
+        "host": null,
         "port": 27017,
         "user": "oracle",
         "database": "oracle",
-        "password": "'password'"
+        "password": ""
       }
     }
   },
   "init": {
     "actions": [
-      { "variable": "password", "value": "password" },
-      { "variable": "public_password", "value": "1234" },
-      { "cmd": "createNamedAccount", "params": ["$password", "PvdD Meldpunt"], "variable": "account", "key": "address" },
-      { "cmd": "createNamedAccount", "params": ["$public_password", "Jaav-tm PvdD Client"], "variable": "client_account", "key": "address" },
+      { "variable": "password", "value": "'password'" },
+      { "cmd": "createNamedAccount", "params": ["$password", "Admin"], "variable": "account", "key": "address" },
       { "cmd": "setMainAccount", "params" : ["$account"] },
       { "cmd": "compile" },
-      { "cmd": "deploy", "params": ["$account", "$password", "Meldpunt"], "variable": "meldpunt", "key": "address" },
-      { "cmd": "oracleContract", "params": ["$account", "$password", "$meldpunt", "oracleCreateGeoIndex", "geometry"] },
-      { "cmd": "deploy", "params": ["$account", "$password", "GeozetBekendmakingen"], "variable": "geozet", "key": "address" },
-      { "cmd": "callContract", "params": ["$account", "$password", "$meldpunt", "setCutPermissionAddress", 0, "$geozet"] },
-      { "cmd": "oracleContract", "params": ["$account", "$password", "$geozet", "oracleCreateGeoIndex", "geometry"] },
-      { "cmd": "oracleContract", "params": ["$account", "$password", "$geozet", "oracleUpdateRecords", "$geozetdata"],
-        "cron": "0 */30 * * * *",
-        "runOnInit": true,
-        "fetch": {
-          "variable": "geozetdata",
-          "url": "http://jaav.eu:4446/geozet",
-          "params": {}
-        }
-      },
-      { "cmd": "deploy", "params": ["$account", "$password", "BiomassaMeldpunt"], "variable": "biomassa", "key": "address" },
-      { "cmd": "callContract", "params": ["$account", "$password", "$meldpunt", "setBiomassFacilityAddress", 0, "$biomassa"] },
-      { "cmd": "callContract", "params": ["$account", "$password", "$biomassa", "createGeoIndex", 0, "geometry"] },
-      { "cmd": "callContract", "params": ["$account", "$password", "$biomassa", "updateRecords", 0, "$biomassadata"],
-        "fetch": {
-          "variable": "biomassadata",
-          "filter": "result => result.features;",
-          "data": "Biomassainstallaties_met_houtstook.json"
-        }
-      },
-      { "cmd": "deploy", "params": ["$account", "$password", "BomenkapMeldpunt"], "variable": "bomenmeldpunt", "key": "address" },
-      { "cmd": "callContract", "params": ["$account", "$password", "$meldpunt", "setCutNotificationAddress", 0, "$bomenmeldpunt"] },
-      { "cmd": "callContract", "params": ["$account", "$password", "$bomenmeldpunt", "createGeoIndex", 0, "geometry"] },
-      { "cmd": "callContract", "params": ["$account", "$password", "$bomenmeldpunt", "updateRecords", 0, "$kapdata"],
-        "fetch": {
-          "variable": "kapdata",
-          "filter": "result => result.features;",
-          "data": "Bomenkap.json"
-        }
-      },
-      { "cmd": "deploy", "params": ["$account", "$password", "AanplantMeldpunt"], "variable": "aanplantmeldpunt", "key": "address" },
-      { "cmd": "callContract", "params": ["$account", "$password", "$meldpunt", "setReplantNotificationAddress", 0, "$aanplantmeldpunt"] },
-      { "cmd": "callContract", "params": ["$account", "$password", "$aanplantmeldpunt", "createGeoIndex", 0, "geometry"] },
-      { "cmd": "callContract", "params": ["$account", "$password", "$aanplantmeldpunt", "updateRecords", 0, "$aanplantdata"],
-        "fetch": {
-          "variable": "aanplantdata",
-          "filter": "result => result.features;",
-          "data": "Bomen_aanplant_of_behouden.json"
-        }
-      }
+      { "cmd": "deploy", "params": ["$account", "$password", "HelloWorld"], "variable": "helloworld", "key": "address" },
+      { "cmd": "queryContract", "params": ["$account", "$helloworld", "hello", ["world"]], "cron": "1 1-10 * * * *" }
     ]
   }
 }
