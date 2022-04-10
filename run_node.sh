@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 node -v
-node ./node/app.js -n single -r 3000 -s 3020
+node ./node/tendermint.js -n single -r 3000 -s 3020
